@@ -46,10 +46,10 @@
         </table>
         <div class="text-slate-500 text-xs mt-0.5"> 基于 <code>clap</code> 结构化解析与 <code>rustyline</code> 终端补全库驱动。 </div>
       </div>
-      <div class="card-light flex-1 flex flex-col justify-between py-1">
-        <div class="font-bold text-slate-800 mb-0.5 text-xs flex items-center justify-between"><span>❖
+      <div class="card-light flex-1 flex flex-col py-1.5">
+        <div class="font-bold text-slate-800 mb-1 text-xs flex items-center justify-between"><span>❖
             调试器微架构特性</span><span class="badge-blue">零侵入</span></div>
-        <ul class="text-slate-600 space-y-1 text-xs">
+        <ul class="text-slate-600 space-y-1.5 text-xs">
           <li><b>零侵入性</b>：通过指令级 Hook 介入，完全不改变客户机特权现场。</li>
           <li><b>即时透视</b>：支持在断点处即时校验 CSR、虚拟内存与物理内存。</li>
           <li><b>符号级反查</b>：结合 ELF 符号表实现函数名与物理/虚存双向解析。</li>
@@ -69,13 +69,22 @@
       <div class="card-slate flex-1 flex flex-col justify-between pb-2">
         <div class="font-bold text-slate-800 mb-0.5 text-xs flex items-center justify-between"><span>❖ 交互式会话示范 (rvdb
             CLI)</span><span class="badge-slate">实机运行</span></div>
-        <pre class="my-0.5 py-1 px-2 text-[11px] leading-tight"><code class="language-text">(rvdb) break main
-Breakpoint 1 at 0x8000_0000 (main)
-(rvdb) continue -&gt; Hit breakpoint 1
-(rvdb) translate 0x8000_0000
-VA 0x8000_0000 -&gt; PA 0x8000_0000 [Sv39: V,R,X]
-(rvdb) p pc -&gt; pc = 0x8000_0000
-(rvdb) step -&gt; 0x8000_0004: auipc sp, 0x1000</code></pre>
+        <pre class="my-0.5 py-1 px-2 text-[11px] leading-tight"><code class="language-text">(rvdb) b main
+Breakpoint set at main <paddr(0x80001394)>
+(rvdb) c
+Breakpoint hit after 32776 steps: 0x80001394: addi sp, sp, -16 main
+(rvdb) l
+> 0x80001394: 0xff010113 addi sp, sp, -16 main
+  0x80001398: 0x00113423 sd ra, 8(sp)
+  0x8000139c: 0x00813023 sd s0/fp, 0(sp)
+  0x800013a0: 0x01010413 addi s0/fp, sp, 16
+  0x800013a4: 0x00003517 auipc a0, 3
+(rvdb) info b
+ 0: paddr(0x80001394)
+(rvdb) p pc
+pc = 0x80001394
+(rvdb) s
+Completed, next: 0x80001398: sd ra, 8(sp)</code></pre>
       </div>
     </div>
   </div>
