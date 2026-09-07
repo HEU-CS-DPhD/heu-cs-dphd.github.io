@@ -1,0 +1,403 @@
+<!--
+  第 9 页: ◈ 核心亮点六：全系统验证 —— Linux 6.18 引导架构与启动拓扑
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点六：全系统验证 —— Linux 6.18 引导架构与启动拓扑</h1>
+  <div class="text-xs text-slate-500 mb-1">工业级固件与内核引导闭环：OpenSBI v1.x 运行时接管、设备树解析与双模式启动分流</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light h-full">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 全系统引导链路与设备树拓扑</span><span
+            class="badge-orange">OpenSBI + Linux 6.18.2</span></div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_09_linux_boot_topology_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 849.390625px;" viewBox="-8 -8 849.390625 144" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_09_linux_boot_topology_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_09_linux_boot_topology_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_09_linux_boot_topology_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_09_linux_boot_topology_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_09_linux_boot_topology_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_09_linux_boot_topology_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_09_linux_boot_topology_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_09_linux_boot_topology_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_09_linux_boot_topology_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_09_linux_boot_topology_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_09_linux_boot_topology_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .cluster-label span,
+              #svg_09_linux_boot_topology_html p {
+                color: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .label text,
+              #svg_09_linux_boot_topology_html span,
+              #svg_09_linux_boot_topology_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .node rect,
+              #svg_09_linux_boot_topology_html .node circle,
+              #svg_09_linux_boot_topology_html .node ellipse,
+              #svg_09_linux_boot_topology_html .node polygon,
+              #svg_09_linux_boot_topology_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_09_linux_boot_topology_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_09_linux_boot_topology_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_09_linux_boot_topology_html .node .label {
+                text-align: center;
+              }
+
+              #svg_09_linux_boot_topology_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_09_linux_boot_topology_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_09_linux_boot_topology_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_09_linux_boot_topology_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_09_linux_boot_topology_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_09_linux_boot_topology_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_09_linux_boot_topology_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_09_linux_boot_topology_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_09_linux_boot_topology_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_09_linux_boot_topology_html .cluster span,
+              #svg_09_linux_boot_topology_html p {
+                color: #333;
+              }
+
+              #svg_09_linux_boot_topology_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_09_linux_boot_topology_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_09_linux_boot_topology_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-pointEnd" class="marker flowchart"
+                viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+                orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-pointStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+                orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-circleEnd" class="marker flowchart"
+                viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-circleStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_09_linux_boot_topology_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M115.063,64L119.229,64C123.396,64,131.729,64,139.179,64C146.629,64,153.196,64,156.479,64L159.763,64"
+                    id="L-SBI-Pay-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-SBI LE-Pay"
+                    style="fill:none;" marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M270.172,64L274.339,64C278.505,64,286.839,64,294.289,64C301.739,64,308.305,64,311.589,64L314.872,64"
+                    id="L-Pay-DTB-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Pay LE-DTB"
+                    style="fill:none;" marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M379.684,45.5L385.497,41.167C391.31,36.833,402.936,28.167,413.798,23.833C424.66,19.5,434.758,19.5,439.807,19.5L444.856,19.5"
+                    id="L-DTB-BootA-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-DTB LE-BootA"
+                    style="fill:none;" marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M379.684,82.5L385.497,86.833C391.31,91.167,402.936,99.833,412.033,104.167C421.129,108.5,427.696,108.5,430.979,108.5L434.263,108.5"
+                    id="L-DTB-BootB-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-DTB LE-BootB"
+                    style="fill:none;" marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M640.766,19.5L646.698,19.5C652.63,19.5,664.495,19.5,678.156,23.279C691.816,27.057,707.273,34.615,715.002,38.393L722.73,42.172"
+                    id="L-BootA-Shell-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-BootA LE-Shell" style="fill:none;"
+                    marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M651.359,108.5L655.526,108.5C659.693,108.5,668.026,108.5,679.921,104.721C691.816,100.943,707.273,93.385,715.002,89.607L722.73,85.828"
+                    id="L-BootB-Shell-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-BootB LE-Shell" style="fill:none;"
+                    marker-end="url(#svg_09_linux_boot_topology_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-SBI-10" data-node="true" data-id="SBI"
+                    transform="translate(57.53125, 64)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-57.53125" y="-18.5" width="115.0625"
+                      height="37"></rect>
+                    <g class="label" style="" transform="translate(-50.03125, -11)">
+                      <rect></rect>
+                      <foreignObject width="100.0625" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">OpenSBI v1.x</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Pay-11" data-node="true" data-id="Pay"
+                    transform="translate(217.6171875, 64)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-52.5546875" y="-18.5"
+                      width="105.109375" height="37"></rect>
+                    <g class="label" style="" transform="translate(-45.0546875, -11)">
+                      <rect></rect>
+                      <foreignObject width="90.109375" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Linux 6.18.2</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-DTB-13" data-node="true" data-id="DTB"
+                    transform="translate(354.8671875, 64)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-34.6953125" y="-18.5"
+                      width="69.390625" height="37"></rect>
+                    <g class="label" style="" transform="translate(-27.1953125, -11)">
+                      <rect></rect>
+                      <foreignObject width="54.390625" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">virt.dtb</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-BootA-15" data-node="true"
+                    data-id="BootA" transform="translate(545.4609375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-95.3046875" y="-19.5"
+                      width="190.609375" height="39"></rect>
+                    <g class="label" style="" transform="translate(-87.8046875, -12)">
+                      <rect></rect>
+                      <foreignObject width="175.609375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">模式 A: Initramfs 内存盘</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-BootB-17" data-node="true"
+                    data-id="BootB" transform="translate(545.4609375, 108.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-105.8984375" y="-19.5"
+                      width="211.796875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-98.3984375, -12)">
+                      <rect></rect>
+                      <foreignObject width="196.796875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">模式 B: VirtIO-Block 持久化</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Shell-19" data-node="true"
+                    data-id="Shell" transform="translate(767.375, 64)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-66.015625" y="-19.5"
+                      width="132.03125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-58.515625, -12)">
+                      <rect></rect>
+                      <foreignObject width="117.03125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Linux Shell 交互</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 通过 <code>make linux LINUX_DIR=... OPENSBI_DIR=...</code> 实现一键编译与引导运行。
+        </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 固件与特权态切换流水线</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>M-Mode 固件引导</b>：CPU 从复位向量 <code>0x1000</code> 或 <code>0x80000000</code> 进入 OpenSBI，初始化特权级 CSR、PMP
+            与串口环境。 </li>
+          <li><b>S-Mode 内核移交</b>：OpenSBI 通过 <code>mret</code> 优雅跳转至 S-Mode Linux 内核入口，并在 <code>a1</code>
+            寄存器传递预加载的扁平设备树（DTB）物理基地址。 </li>
+          <li><b>标准化 DTB 动态驱动探测</b>： 内核根据 <code>virt.dtb</code> 自动探测并注册 UART 16550A 控制台、PLIC 中断路由与 VirtIO-MMIO 块存储总线。
+          </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-blue-50/70 border border-blue-200 rounded-lg">
+        <div class="font-bold text-blue-800 mb-0.5 text-xs">❖ 自动化构建流水线</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          根目录 <code>Makefile</code> 封装 <code>linux</code>、<code>linux-debug</code>、<code>linux-qemu</code> 目标，一键自动编译 DTC
+          设备树、内核 Image 与 OpenSBI Payload。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

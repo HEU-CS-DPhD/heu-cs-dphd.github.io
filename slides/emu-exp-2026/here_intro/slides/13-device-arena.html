@@ -1,0 +1,381 @@
+<!--
+  第 13 页: ◈ 模块一：Board 构建 —— 内存模型与 Arena 设备管理
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块一：Board 构建 —— 内存模型与 Arena 设备管理</h1>
+  <div class="text-xs text-slate-500 mb-2">突破 Rust 所有权难题：消解 <code>Rc&lt;RefCell&lt;T&gt;&gt;</code> 运行时借用与引用计数开销</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 传统痛点 vs DeviceArena
+            架构</span><span class="badge-emerald">零成本抽象</span></div>
+        <div class="text-slate-600 mb-1 leading-normal"> MMIO 依赖 CPU、总线、中断互持设备引用，传统 <code>Rc&lt;RefCell&gt;</code>
+          在高频访存路径带来高额开销： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_13_device_arena_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 500.390625px;" viewBox="-8 -8 500.390625 229" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_13_device_arena_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_13_device_arena_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_13_device_arena_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_13_device_arena_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_13_device_arena_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_13_device_arena_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_13_device_arena_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_13_device_arena_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_13_device_arena_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_13_device_arena_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_13_device_arena_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_13_device_arena_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_13_device_arena_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_13_device_arena_html .cluster-label span,
+              #svg_13_device_arena_html p {
+                color: #333;
+              }
+
+              #svg_13_device_arena_html .label text,
+              #svg_13_device_arena_html span,
+              #svg_13_device_arena_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_13_device_arena_html .node rect,
+              #svg_13_device_arena_html .node circle,
+              #svg_13_device_arena_html .node ellipse,
+              #svg_13_device_arena_html .node polygon,
+              #svg_13_device_arena_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_13_device_arena_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_13_device_arena_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_13_device_arena_html .node .label {
+                text-align: center;
+              }
+
+              #svg_13_device_arena_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_13_device_arena_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_13_device_arena_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_13_device_arena_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_13_device_arena_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_13_device_arena_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_13_device_arena_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_13_device_arena_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_13_device_arena_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_13_device_arena_html .cluster span,
+              #svg_13_device_arena_html p {
+                color: #333;
+              }
+
+              #svg_13_device_arena_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_13_device_arena_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_13_device_arena_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_13_device_arena_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_13_device_arena_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_13_device_arena_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_13_device_arena_html_flowchart-circleStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_13_device_arena_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_13_device_arena_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M107.719,106.5L111.885,106.5C116.052,106.5,124.385,106.5,131.835,106.5C139.285,106.5,145.852,106.5,149.135,106.5L152.419,106.5"
+                    id="L-CPU-Arena-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CPU LE-Arena"
+                    style="fill:none;" marker-end="url(#svg_13_device_arena_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M261.539,87L275.22,75.583C288.901,64.167,316.263,41.333,333.227,29.917C350.192,18.5,356.758,18.5,360.042,18.5L363.325,18.5"
+                    id="L-Arena-U-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Arena LE-U"
+                    style="fill:none;" marker-end="url(#svg_13_device_arena_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M318.625,106.5L322.792,106.5C326.958,106.5,335.292,106.5,343.992,106.5C352.692,106.5,361.758,106.5,366.292,106.5L370.825,106.5"
+                    id="L-Arena-P-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Arena LE-P"
+                    style="fill:none;" marker-end="url(#svg_13_device_arena_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M261.539,126L275.22,137.417C288.901,148.833,316.263,171.667,333.696,183.083C351.129,194.5,358.633,194.5,362.385,194.5L366.138,194.5"
+                    id="L-Arena-V-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Arena LE-V"
+                    style="fill:none;" marker-end="url(#svg_13_device_arena_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-CPU-32" data-node="true" data-id="CPU"
+                    transform="translate(53.859375, 106.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-53.859375" y="-18.5"
+                      width="107.71875" height="37"></rect>
+                    <g class="label" style="" transform="translate(-46.359375, -11)">
+                      <rect></rect>
+                      <foreignObject width="92.71875" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">CPU / MMIO</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Arena-33" data-node="true"
+                    data-id="Arena" transform="translate(238.171875, 106.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-80.453125" y="-19.5"
+                      width="160.90625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-72.953125, -17)">
+                      <rect></rect>
+                      <foreignObject width="145.90625" height="34">
+                        <div xmlns="http://www.w3.org/1999/xhtml"
+                          style="display: inline-block; white-space: nowrap; font-size: 13px; line-height: 1.25; text-align: center;">
+                          <span class="nodeLabel">DeviceArena<br />统一管理设备所有权</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-U-35" data-node="true" data-id="U"
+                    transform="translate(426.5078125, 18.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-57.8828125" y="-18.5"
+                      width="115.765625" height="37"></rect>
+                    <g class="label" style="" transform="translate(-50.3828125, -11)">
+                      <rect></rect>
+                      <foreignObject width="100.765625" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">UART 16550A</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-P-37" data-node="true" data-id="P"
+                    transform="translate(426.5078125, 106.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-50.3828125" y="-19.5"
+                      width="100.765625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-42.8828125, -12)">
+                      <rect></rect>
+                      <foreignObject width="85.765625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">PLIC 中断核</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-V-39" data-node="true" data-id="V"
+                    transform="translate(426.5078125, 194.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-55.0703125" y="-18.5"
+                      width="110.140625" height="37"></rect>
+                    <g class="label" style="" transform="translate(-47.5703125, -11)">
+                      <rect></rect>
+                      <foreignObject width="95.140625" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">VirtIO MMIO</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 集中所有权管理，通过轻量索引句柄访问，完全消除动态借用与死锁隐患。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1">❖ MMIO 总线分派与 DeviceTrait</div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> struct</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> MemoryMapIO</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    entries</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Vec</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">MMIOEntry</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">impl</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> MemoryMapIO</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> read</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">&amp;</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;">self</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> addr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> len</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> -&gt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Result</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">u64</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> MemError</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">        let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> dev</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">find_device</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">addr</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">?</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">;</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">        dev</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">read</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">addr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> -</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> dev</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">base</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(),</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> len</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">    }</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-600 leading-normal mt-1 mb-0.5"> 所有外设统一实现 <code>DeviceTrait</code> 硬件接口： </div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> trait</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> DeviceTrait</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Send</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> +</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> '</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">static</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> read</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">&amp;mut</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> offset</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> len</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> -&gt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Result</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">u64</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> MemError</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;;</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> write</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">&amp;mut</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> offset</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> val</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u64</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> len</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> -&gt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Result</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;(),</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> MemError</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;;</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

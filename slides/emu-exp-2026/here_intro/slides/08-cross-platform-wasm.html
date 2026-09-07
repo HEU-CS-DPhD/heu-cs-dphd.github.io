@@ -1,0 +1,80 @@
+<!--
+  第 8 页: ◈ 核心亮点五：跨平台构建矩阵与 WebAssembly 浏览器仿真
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点五：跨平台构建矩阵与 WebAssembly 浏览器仿真</h1>
+  <div class="text-xs text-slate-500 mb-1">自动化 CD 流水线发布 5 种原生目标平台，通过 WASM 赋予浏览器开箱即用的 RISC-V 运行环境</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ GitHub Actions 全自动化 CD
+            矩阵</span><span class="badge-emerald">.github/workflows/CD.yml</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>操作系统</th>
+              <th>Target 架构</th>
+              <th>发布产物</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Linux</td>
+              <td><code>x86_64-unknown-linux-gnu</code></td>
+              <td>here-x86_64-linux</td>
+            </tr>
+            <tr>
+              <td>Linux</td>
+              <td><code>aarch64-unknown-linux-gnu</code></td>
+              <td>here-aarch64-linux</td>
+            </tr>
+            <tr>
+              <td>macOS</td>
+              <td><code>x86_64-apple-darwin</code></td>
+              <td>here-x86_64-macos</td>
+            </tr>
+            <tr>
+              <td>macOS</td>
+              <td><code>aarch64-apple-darwin</code> (M1/M2/M3)</td>
+              <td>here-aarch64-macos</td>
+            </tr>
+            <tr>
+              <td>Windows</td>
+              <td><code>x86_64-pc-windows-msvc</code></td>
+              <td>here-x86_64-windows.exe</td>
+            </tr>
+            <tr class="bg-orange-50/70 font-bold">
+              <td>Web / WASM</td>
+              <td><code>wasm32-unknown-unknown</code></td>
+              <td>rvemu-web 库</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-slate-500 text-xs mt-1"> 针对 aarch64-linux 自动化配置跨平台交叉编译链，一键打包发布 Releases。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ WebAssembly 重要工程亮点
+            (rvemu-web)</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>纯内存驱动的系统主板</b>： 在 <code>src/wasm_api.rs</code> 中将 <code>VirtBoard</code> 无损封装为
+            <code>WasmEmulator</code>，支持在浏览器中以字节数组直接加载 ELF 或纯二进制镜像。
+          </li>
+          <li><b>异步 UART 字符流桥接</b>： 设计 <code>UartBytePort</code> 环形缓冲区，将串口输入/输出解耦为 <code>push_uart_input</code> 与
+            <code>take_uart_output</code>，无缝对接前端 Xterm.js 虚拟终端。
+          </li>
+          <li><b>网页内交互式 rvdb 调试</b>： 浏览器端即可运行完整的单步调试、寄存器查看与循环执行（<code>WasmRvdb</code>），无需用户在本地安装任何 GCC 或 Rust 工具链！ </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-orange-50/70 border border-orange-200 rounded-lg">
+        <div class="font-bold text-orange-800 mb-0.5 text-xs">❖ 线上体验地址</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          线上运行实例已部署：<a href="http://here-emulator.github.io/here-web/" target="_blank"
+            class="text-blue-600 underline">http://here-emulator.github.io/here-web/</a>，支持在浏览器直接体验全系统模拟。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

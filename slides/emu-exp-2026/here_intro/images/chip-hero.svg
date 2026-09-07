@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="accentOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="accentBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="500" fill="#f8fafc" rx="16"/>
+
+  <!-- Subtle Circuit Track Patterns -->
+  <g stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.8">
+    <path d="M 60 100 L 180 100 L 220 140 L 220 220"/>
+    <path d="M 100 60 L 200 60 L 240 100 L 240 200"/>
+    <path d="M 60 400 L 160 400 L 200 360 L 200 300"/>
+    <path d="M 740 120 L 640 120 L 600 160 L 600 220"/>
+    <path d="M 720 380 L 620 380 L 580 340 L 580 280"/>
+    <circle cx="60" cy="100" r="4" fill="#3b82f6"/>
+    <circle cx="100" cy="60" r="4" fill="#f97316"/>
+    <circle cx="60" cy="400" r="4" fill="#10b981"/>
+    <circle cx="740" cy="120" r="4" fill="#6366f1"/>
+    <circle cx="720" cy="380" r="4" fill="#f59e0b"/>
+  </g>
+
+  <!-- Central Processor Carrier Board -->
+  <rect x="250" y="80" width="300" height="340" rx="20" fill="url(#chipGrad)" stroke="#cbd5e1" stroke-width="2" filter="url(#softShadow)"/>
+
+  <!-- Outer Pin Arrays -->
+  <g fill="#94a3b8">
+    <!-- Top Pins -->
+    <rect x="290" y="66" width="12" height="14" rx="2"/>
+    <rect x="320" y="66" width="12" height="14" rx="2"/>
+    <rect x="350" y="66" width="12" height="14" rx="2"/>
+    <rect x="380" y="66" width="12" height="14" rx="2"/>
+    <rect x="410" y="66" width="12" height="14" rx="2"/>
+    <rect x="440" y="66" width="12" height="14" rx="2"/>
+    <rect x="470" y="66" width="12" height="14" rx="2"/>
+    <rect x="500" y="66" width="12" height="14" rx="2"/>
+
+    <!-- Bottom Pins -->
+    <rect x="290" y="420" width="12" height="14" rx="2"/>
+    <rect x="320" y="420" width="12" height="14" rx="2"/>
+    <rect x="350" y="420" width="12" height="14" rx="2"/>
+    <rect x="380" y="420" width="12" height="14" rx="2"/>
+    <rect x="410" y="420" width="12" height="14" rx="2"/>
+    <rect x="440" y="420" width="12" height="14" rx="2"/>
+    <rect x="470" y="420" width="12" height="14" rx="2"/>
+    <rect x="500" y="420" width="12" height="14" rx="2"/>
+
+    <!-- Left Pins -->
+    <rect x="236" y="120" width="14" height="12" rx="2"/>
+    <rect x="236" y="150" width="14" height="12" rx="2"/>
+    <rect x="236" y="180" width="14" height="12" rx="2"/>
+    <rect x="236" y="210" width="14" height="12" rx="2"/>
+    <rect x="236" y="240" width="14" height="12" rx="2"/>
+    <rect x="236" y="270" width="14" height="12" rx="2"/>
+    <rect x="236" y="300" width="14" height="12" rx="2"/>
+    <rect x="236" y="330" width="14" height="12" rx="2"/>
+    <rect x="236" y="360" width="14" height="12" rx="2"/>
+
+    <!-- Right Pins -->
+    <rect x="550" y="120" width="14" height="12" rx="2"/>
+    <rect x="550" y="150" width="14" height="12" rx="2"/>
+    <rect x="550" y="180" width="14" height="12" rx="2"/>
+    <rect x="550" y="210" width="14" height="12" rx="2"/>
+    <rect x="550" y="240" width="14" height="12" rx="2"/>
+    <rect x="550" y="270" width="14" height="12" rx="2"/>
+    <rect x="550" y="300" width="14" height="12" rx="2"/>
+    <rect x="550" y="330" width="14" height="12" rx="2"/>
+    <rect x="550" y="360" width="14" height="12" rx="2"/>
+  </g>
+
+  <!-- Silicon Die Core Area -->
+  <rect x="280" y="110" width="240" height="280" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Core Branding Badge -->
+  <rect x="300" y="130" width="200" height="54" rx="8" fill="#0f172a"/>
+  <text x="400" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="900" font-size="24" fill="#ffffff" text-anchor="middle" letter-spacing="3">HERE</text>
+  <text x="400" y="176" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11" fill="#94a3b8" text-anchor="middle" letter-spacing="1">RISC-V FULL-SYSTEM EMULATOR</text>
+
+  <!-- Core Functional Sub-blocks -->
+  <!-- Block 1: Decoder & iCache -->
+  <rect x="300" y="196" width="94" height="54" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="347" y="218" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1d4ed8" text-anchor="middle">Decoder &amp; iCache</text>
+  <text x="347" y="234" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#3b82f6" text-anchor="middle">8K Entries Direct</text>
+
+  <!-- Block 2: Integer & Privileged -->
+  <rect x="406" y="196" width="94" height="54" rx="6" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+  <text x="453" y="218" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#b91c1c" text-anchor="middle">RV64GC Core</text>
+  <text x="453" y="234" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#ef4444" text-anchor="middle">M / S / U Priv</text>
+
+  <!-- Block 3: FPU IEEE-754 -->
+  <rect x="300" y="258" width="94" height="54" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="347" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#15803d" text-anchor="middle">Soft FPU</text>
+  <text x="347" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#22c55e" text-anchor="middle">RV32/64 F &amp; D</text>
+
+  <!-- Block 4: RVV Vector Engine -->
+  <rect x="406" y="258" width="94" height="54" rx="6" fill="#fff7ed" stroke="#fed7aa" stroke-width="1"/>
+  <text x="453" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#c2410c" text-anchor="middle">Vector 1.0</text>
+  <text x="453" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#ea580c" text-anchor="middle">VLEN=128 SIMD</text>
+
+  <!-- Block 5: MMU & TLB Virtual Memory -->
+  <rect x="300" y="320" width="200" height="56" rx="6" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
+  <text x="400" y="342" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#7e22ce" text-anchor="middle">MMU · Sv39 / Sv48</text>
+  <text x="400" y="358" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#a855f7" text-anchor="middle">Multi-Level Page Table &amp; Linux Ready</text>
+
+  <!-- Left Callout Banner: Rust Powered -->
+  <g transform="translate(60, 200)">
+    <rect width="140" height="56" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#softShadow)"/>
+    <circle cx="28" cy="28" r="14" fill="#ea580c"/>
+    <text x="28" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">Rs</text>
+    <text x="54" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#0f172a">Rust 2024</text>
+    <text x="54" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#64748b">Zero-Cost Safe</text>
+  </g>
+
+  <!-- Right Callout Banner: Dual Target -->
+  <g transform="translate(600, 200)">
+    <rect width="140" height="56" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#softShadow)"/>
+    <circle cx="28" cy="28" r="14" fill="#2563eb"/>
+    <text x="28" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">W</text>
+    <text x="54" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#0f172a">Native &amp; Web</text>
+    <text x="54" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="500" font-size="11" fill="#64748b">CLI + WASM</text>
+  </g>
+</svg>

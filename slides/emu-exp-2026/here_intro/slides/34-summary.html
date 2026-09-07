@@ -1,0 +1,55 @@
+<!--
+  第 34 页: ◈ 全景能力总结与工程亮点 (Summary &amp; Capabilities)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 全景能力总结与工程亮点 (Summary &amp; Capabilities)</h1>
+  <div class="text-xs text-slate-500 mb-3">HERE RISC-V 模拟器微架构全栈自研实现与全系统运行能力</div>
+  <div class="grid grid-cols-12 gap-3.5 text-xs">
+    <div class="col-span-3 card-light flex flex-col justify-between">
+      <div>
+        <div class="badge-blue mb-2">⚡ 高性能微架构</div>
+        <div class="font-bold text-slate-800 mb-1">分级译码与 iCache</div>
+        <div class="text-slate-600 leading-relaxed text-xs"> 8192 表项直映缓存带来 96.4% 命中率；结合 O(1) 功能码查表与 1024
+          周期批处理内循环，提供极致仿真性能。 </div>
+      </div>
+      <div class="text-blue-700 font-bold mt-2 text-right">Zero-Cost →</div>
+    </div>
+    <div class="col-span-3 card-light flex flex-col justify-between">
+      <div>
+        <div class="badge-emerald mb-2">🧩 完整指令集生态</div>
+        <div class="font-bold text-slate-800 mb-1">RV64GCV + 特权架构</div>
+        <div class="text-slate-600 leading-relaxed text-xs"> 覆盖整数 I/M、原子 A、浮点 F/D、压缩 C 及最新 RVV 1.0 向量扩展；实现 Sv39/Sv48
+          多级页表与 M/S/U 特权态。 </div>
+      </div>
+      <div class="text-emerald-700 font-bold mt-2 text-right">Full ISA →</div>
+    </div>
+    <div class="col-span-3 card-light flex flex-col justify-between">
+      <div>
+        <div class="badge-purple mb-2">🛠 双轨工业级调试</div>
+        <div class="font-bold text-slate-800 mb-1">rvdb &amp; GDB Remote Stub</div>
+        <div class="text-slate-600 leading-relaxed text-xs"> 自研现代交互式 <code>rvdb</code> (支持 ftrace/地址转换/断点/历史)；无缝接入 VS
+          Code/GDB 标准工业工具链。 </div>
+      </div>
+      <div class="text-purple-700 font-bold mt-2 text-right">Interactive →</div>
+    </div>
+    <div class="col-span-3 card-light flex flex-col justify-between">
+      <div>
+        <div class="badge-orange mb-2">🐧 全系统验证落地</div>
+        <div class="font-bold text-slate-800 mb-1">引导真实 Linux OS</div>
+        <div class="text-slate-600 leading-relaxed text-xs"> 成功加载 OpenSBI 固件，挂载 VirtIO-Block Ext4 文件系统，顺利启动 Linux 6.x
+          并运行 BusyBox 与复杂算力程序。 </div>
+      </div>
+      <div class="text-orange-700 font-bold mt-2 text-right">Linux Ready →</div>
+    </div><!-- Bottom Banner -->
+    <div
+      class="col-span-12 p-3 bg-gradient-to-r from-orange-50 via-white to-blue-50 rounded-xl border border-slate-200 flex items-center justify-between mt-1">
+      <div>
+        <div class="text-sm font-bold text-slate-900">开源仓库与项目文档</div>
+        <div class="text-xs text-slate-500 font-mono">/home/mowind/dev/rust/riscv-emulator/</div>
+      </div>
+      <div class="flex items-center gap-2"><span class="badge-slate">Rust 2024 Edition</span><span
+          class="badge-orange font-bold">HERE RISC-V Emulator</span></div>
+    </div>
+  </div>
+</div>

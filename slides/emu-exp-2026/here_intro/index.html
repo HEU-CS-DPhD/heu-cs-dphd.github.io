@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HERE: 基于现代 Rust 的全系统 RISC-V 模拟器架构与实现</title>
+  
+  <!-- 外部排版与视觉样式表 -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- 顶部切页进度条 -->
+  <div id="progress-bar"></div>
+
+  <!-- 幻灯片视口与 16:9 画布容器 -->
+  <div id="viewport">
+    <div id="slide-frame">
+      <!-- 幻灯片内容将由 viewer.js 从 slides/*.html 异步加载挂载 -->
+      <div id="loading" style="display: flex; height: 100%; align-items: center; justify-content: center; color: #64748b; font-size: 14px; font-family: sans-serif;">
+        正在加载幻灯片...
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部快捷控制栏 -->
+  <div id="toolbar">
+    <button class="tool-btn" id="btn-prev" title="上一页 (←)">&#x25C0;</button>
+    <span id="page-indicator" style="font-family: monospace; font-size: 11px; padding: 0 4px;">1 / 34</span>
+    <button class="tool-btn" id="btn-next" title="下一页 (→)">&#x25B6;</button>
+    <span style="opacity: 0.3; margin: 0 2px;">|</span>
+    <button class="tool-btn" id="btn-overview" title="概览视图 (O)">&#x229E; 概览</button>
+    <button class="tool-btn" id="btn-fullscreen" title="全屏 (F)">&#x26F6; 全屏</button>
+  </div>
+
+  <!-- 全景缩略图模态框 (Overview) -->
+  <div id="overview-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div style="font-size: 18px; font-weight: bold; color: #ffffff;">幻灯片概览 (34 页)</div>
+      <button class="tool-btn" id="btn-close-overview" style="font-size: 18px;">&#x2715; 关闭</button>
+    </div>
+    <div class="grid-container" id="grid-container"></div>
+  </div>
+
+  <!-- 播放交互引擎 (自动加载 slides/*.html 并渲染) -->
+  <script src="./viewer.js"></script>
+</body>
+</html>

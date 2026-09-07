@@ -1,0 +1,36 @@
+<!--
+  第 25 页: ◈ 模块二：后端执行扩展 —— 特权 CSR 寄存器体系
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 特权 CSR 寄存器体系</h1>
+  <div class="text-xs text-slate-500 mb-2">全面实现 60+ 标准 CSR 寄存器 · 严苛的特权级读写鉴权机制</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ M-Mode 机器态核心 CSR
+            矩阵</span><span class="badge-blue">最高特权级</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>状态与特权控制</b>：<code>mstatus</code> (MPP/MPIE/MIE 状态栈), <code>misa</code> (扩展支持位图)。 </li>
+          <li><b>中断与异常委派</b>：<code>medeleg</code> (异常委派), <code>mideleg</code> (中断委派至 S 态)。 </li>
+          <li><b>陷阱处理上下文</b>：<code>mtvec</code> (陷阱入口基址与模式), <code>mepc</code> (受挫 PC), <code>mcause</code> (陷阱原因),
+            <code>mtval</code> (附加故障地址)。 </li>
+          <li><b>物理内存保护 (PMP)</b>：<code>pmpcfg0~3</code> 与 <code>pmpaddr0~15</code> 隔离非特权空间。 </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ S-Mode 监管态与访问鉴权</span><span
+            class="badge-emerald">Linux 运行态</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>S-Mode 核心寄存器</b>：<code>sstatus</code>, <code>sie</code>, <code>stvec</code>, <code>sepc</code>,
+            <code>scause</code>, <code>stval</code>, <code>sip</code>。 </li>
+          <li><b>虚存模式控制</b>：<code>satp</code> 控制 Sv39/Sv48 分页模式开启与根页表物理基址。 </li>
+          <li><b>严格的读写校验器</b>： 通过 <code>read_validator</code> 与 <code>write_validator</code>
+            拦截低特权级越权访问或非法只读写入，严格触发非法指令异常 (IllegalInstruction)。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

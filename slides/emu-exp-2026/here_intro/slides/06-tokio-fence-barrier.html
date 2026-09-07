@@ -1,0 +1,61 @@
+<!--
+  第 6 页: ◈ 核心亮点三：Rust + Tokio —— 内存栅栏与无畏并发保障
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点三：Rust + Tokio —— 内存栅栏与无畏并发保障</h1>
+  <div class="text-xs text-slate-500 mb-1">严格遵循 VirtIO 规范内存模型：原子操作、内存栅栏与 DrainBarrier 优雅退出机制</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 异步 Worker
+            任务执行与内存屏障</span><span class="badge-purple">virtio_block.rs</span></div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">async</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> run_task</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">&amp;mut</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> task</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VirtIOBlockAsyncTask</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">    // 1. 同步 Guest 在 QueueNotify 前发布的所有写入</span></span>
+<span class="line"><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">    std</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">sync</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">atomic</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">fence</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">Ordering</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">Acquire</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    match</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> task</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">        VirtIOBlockAsyncTask</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">Read</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">t</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> =&gt;</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">read</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">t</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">await</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">        VirtIOBlockAsyncTask</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">Write</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">t</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> =&gt;</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">write</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">t</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">await</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">        VirtIOBlockAsyncTask</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">Flush</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">c</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> =&gt;</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">            let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> status</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> if</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> self</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">file</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">sync_data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">()</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">await</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">is_ok</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">()</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">                VirtIOBlkReqStatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">Ok</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">            }</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> else</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VirtIOBlkReqStatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">IoErr</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> };</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">            c</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">complete</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">status</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #4C9A91; --shiki-light: #2F798A;"> 1</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">        }</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">        VirtIOBlockAsyncTask</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">DrainBarrier</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">ack</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> =&gt;</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> _</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> ack</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">send</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(());</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> }</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">    }</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-500 text-xs mt-1"> 完成时 <code>c.complete</code> 原子置位 status 并触发 PLIC 中断。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 无畏并发设计与工程保障</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>跨线程数据安全与内存栅栏</b>： Worker 在消费任务前通过 <code>atomic::fence(Ordering::Acquire)</code> 强制同步 Guest 发布的数据；发布
+            Used 环时执行写状态与释放屏障。 </li>
+          <li><b>安全排空屏障 (DrainBarrier)</b>： 当 Guest OS 驱动发起设备重置（Device Reset）时，模拟器注入 <code>DrainBarrier</code>
+            同步阻塞排空所有飞行中的异步 I/O 任务。 </li>
+          <li><b>优雅停机与刷盘保障</b>： 模拟器退出时通过 <code>watch::channel</code> 广播取消信号，确保调用 <code>File::sync_data().await</code>
+            刷盘落盘，彻底杜绝镜像文件损坏。 </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-blue-50/70 border border-blue-200 rounded-lg">
+        <div class="font-bold text-blue-800 mb-0.5 text-xs">❖ 编译期无数据竞争保证</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          Rust 的 <code>Send + 'static</code> 静态约束保证传递给 Tokio 线程的任务数据所有权明确，杜绝悬垂指针与并发写写竞争。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

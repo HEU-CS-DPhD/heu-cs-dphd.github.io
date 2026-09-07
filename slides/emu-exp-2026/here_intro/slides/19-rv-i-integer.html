@@ -1,0 +1,53 @@
+<!--
+  第 19 页: ◈ 模块二：后端执行扩展 —— 基础整数指令集 (RV32I &amp; RV64I)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 基础整数指令集 (RV32I &amp; RV64I)</h1>
+  <div class="text-xs text-slate-500 mb-2">精确复现 RISC-V 基础规范：符号拓展、截断运算与分支跳转</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 算术、位移与分支跳转</span><span
+            class="badge-blue">核心运算</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>算术与逻辑运算</b>：<code>ADD/SUB/AND/OR/XOR/SLL/SRL/SRA</code> 及立即数版本，统一通过 <code>ExecTrait</code> 泛型模板纯函数计算。
+          </li>
+          <li><b>64 位特有截断指令 (*W 后缀)</b>：<code>ADDW/SUBW/SLLW/SRAW</code> 对低 32 位运算后强制执行 64 位符号拓展 (Sign-Extension)。 </li>
+          <li><b>分支与无条件跳转</b>：<code>BEQ/BNE/BLT/BGE/BLTU/BGEU</code> 比较条件分支；<code>JAL/JALR</code> 寄存器链接跳转与 PC 对齐校验。
+          </li>
+          <li><b>高位立即数寻址</b>：<code>LUI</code> 与 <code>AUIPC</code> 高 20 位立即数构造与 PC 相对寻址。 </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 内存访存加载与存储 (Load /
+            Store)</span><span class="badge-orange">符号与零扩展</span></div>
+        <div class="text-slate-600 leading-normal mb-1"> 统一通过泛型处理 1/2/4/8 字节访存与符号拓展： </div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;">super</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> handle_load</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">T</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> const</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> EXTEND</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> bool</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;(</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;mut</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> RVCPU</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> rd</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> addr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> -&gt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Result</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;(),</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Exception</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> where</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> T</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> UnsignedInteger</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">    let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">read</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">T</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">addr</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">?</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">;</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">    let</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> mut</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> (</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">data</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">into</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">()</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u64</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> as</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">;</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    if</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> EXTEND</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">        data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> sign_extend</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> size_of</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">T</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;()</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> *</span><span style="--shiki-dark: #4C9A91; --shiki-light: #2F798A;"> 8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">    }</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">reg_file</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">write</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">rd</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> data</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">    Ok</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(())</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-500 text-xs mt-0.5"> 支持 <code>LB/LBU</code> (1B), <code>LH/LHU</code> (2B),
+          <code>LW/LWU</code> (4B), <code>LD</code> (8B) 及 <code>SB/SH/SW/SD</code>。 </div>
+      </div>
+    </div>
+  </div>
+</div>

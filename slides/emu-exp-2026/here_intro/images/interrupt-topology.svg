@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" width="100%" height="100%">
+  <defs>
+    <filter id="shadowInt" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrInt" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#475569"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="440" fill="#f8fafc" rx="14"/>
+
+  <!-- Title -->
+  <text x="36" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="16" fill="#0f172a">中断与特权级异常拓扑体系 (Interrupt &amp; Trap Topology)</text>
+  <text x="36" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">ACLINT (定时/软件) + PLIC (平台外部中断) → TrapController → M/S 特权级委派与响应</text>
+
+  <!-- Left Column: Interrupt Sources (Width: 200) -->
+  <g transform="translate(36, 76)">
+    <!-- Source Box -->
+    <rect width="200" height="336" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadowInt)"/>
+    <rect width="200" height="28" rx="10" fill="#f1f5f9"/>
+    <text x="100" y="19" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#334155" text-anchor="middle">中断源信号 (IRQ Sources)</text>
+
+    <!-- UART -->
+    <rect x="14" y="44" width="172" height="48" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="24" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">UART 16550A</text>
+    <text x="24" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#3b82f6">IRQ 10 (Line Level)</text>
+
+    <!-- VirtIO Devices -->
+    <rect x="14" y="104" width="172" height="48" rx="6" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="24" y="124" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">VirtIO Block MMIO</text>
+    <text x="24" y="140" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#3b82f6">IRQ 1~8 (Queue Done)</text>
+
+    <!-- CPU Clock Timer -->
+    <rect x="14" y="174" width="172" height="54" rx="6" fill="#fef3c7" stroke="#fde68a" stroke-width="1"/>
+    <text x="24" y="194" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#b45309">Virtual Clock</text>
+    <text x="24" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#92400e">mtime 周期递增计数</text>
+
+    <!-- Software IPI -->
+    <rect x="14" y="240" width="172" height="54" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="24" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#15803d">软件核间中断 (IPI)</text>
+    <text x="24" y="276" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#166534">msip / ssip 寄存器写入</text>
+  </g>
+
+  <!-- Middle Left Column: Controllers (PLIC & CLINT) (Width: 260) -->
+  <g transform="translate(266, 76)">
+    <!-- PLIC Box -->
+    <rect width="260" height="180" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="1.6" filter="url(#shadowInt)"/>
+    <rect width="260" height="28" rx="10" fill="#eff6ff"/>
+    <text x="130" y="19" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#1d4ed8" text-anchor="middle">PLIC (平台级外部中断控制器)</text>
+
+    <text x="16" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 优先级矩阵: Source Priority (1..7)</text>
+    <text x="16" y="70" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 挂起与使能: Pending IP &amp; Enable IE</text>
+    <text x="16" y="88" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 阈值过滤: Threshold 寄存器</text>
+    <rect x="16" y="102" width="228" height="64" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="26" y="122" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#0f172a">Claim / Complete 原子协议握手</text>
+    <text x="26" y="138" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#2563eb">1. CPU 读 Claim → 取得最高优先级中断</text>
+    <text x="26" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#16a34a">2. 处理完成写 Complete → 释放中断线</text>
+
+    <!-- ACLINT / CLINT Box -->
+    <rect y="196" width="260" height="140" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.6" filter="url(#shadowInt)"/>
+    <rect y="196" width="260" height="28" rx="10" fill="#fff7ed"/>
+    <text x="130" y="215" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#c2410c" text-anchor="middle">ACLINT / CLINT (本地核中断)</text>
+    <text x="16" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• MTIMER: mtime >= mtimecmp</text>
+    <text x="16" y="264" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#ea580c">  → 产生 Machine Timer (MTIP)</text>
+    <text x="16" y="286" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• MSWI: 写 msip → 产生 MSIP</text>
+    <text x="16" y="304" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• SSWI: 写 ssip → 产生 SSIP (S态软件)</text>
+  </g>
+
+  <!-- Connectors from sources to controllers -->
+  <path d="M 236 124 L 266 136" stroke="#475569" stroke-width="1.5" marker-end="url(#arrInt)"/>
+  <path d="M 236 290 L 266 270" stroke="#475569" stroke-width="1.5" marker-end="url(#arrInt)"/>
+
+  <!-- Right Column: Trap Controller & CPU Privilege Core (Width: 300) -->
+  <g transform="translate(556, 76)">
+    <rect width="290" height="336" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6" filter="url(#shadowInt)"/>
+    <rect width="290" height="28" rx="10" fill="#f8fafc"/>
+    <text x="145" y="19" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#0f172a" text-anchor="middle">TrapController &amp; 特权模式</text>
+
+    <!-- M-Mode & S-Mode Delegation -->
+    <rect x="14" y="38" width="262" height="130" rx="8" fill="#fef2f2" stroke="#fecaca" stroke-width="1.2"/>
+    <text x="24" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#b91c1c">中断与异常委派机制 (Delegation)</text>
+    <text x="24" y="78" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#991b1b">• mideleg: 中断委派至 S-Mode</text>
+    <text x="24" y="94" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#991b1b">• medeleg: 异常委派至 S-Mode</text>
+    <text x="24" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#7f1d1d">若相应 bit 置 1: 硬件直接跳转至 stvec</text>
+    <text x="24" y="132" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#7f1d1d">现场保存至 sepc/scause/stval 绕过 M-Mode</text>
+    <text x="24" y="150" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#dc2626">→ 赋能 Linux 内核高吞吐中断处理</text>
+
+    <!-- Context Switch & Ret -->
+    <rect x="14" y="180" width="262" height="142" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="24" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#0f172a">硬件现场恢复与返回</text>
+    <text x="24" y="222" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• mret: PC ← mepc, mie ← mpie</text>
+    <text x="24" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• sret: PC ← sepc, sie ← spie</text>
+    <text x="24" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">Vector 模式支持: mtvec.base + 4 × cause</text>
+    <text x="24" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">Direct 模式支持: 统一进入通用处理程序</text>
+    <text x="24" y="304" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#15803d">严格校验 mstatus.mprv 与 privilege_level</text>
+  </g>
+
+  <!-- Connectors from controllers to TrapController -->
+  <path d="M 526 166 L 556 146" stroke="#dc2626" stroke-width="2" marker-end="url(#arrRed)"/>
+  <path d="M 526 266 L 556 246" stroke="#475569" stroke-width="1.5" marker-end="url(#arrInt)"/>
+</svg>

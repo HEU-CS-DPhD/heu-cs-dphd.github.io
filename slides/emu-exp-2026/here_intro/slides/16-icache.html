@@ -1,0 +1,59 @@
+<!--
+  第 16 页: ◈ 模块二：CPU 前端译码 —— 译码指令缓存 (iCache)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：CPU 前端译码 —— 译码指令缓存 (iCache)</h1>
+  <div class="text-xs text-slate-500 mb-2">为高频循环与系统调用热点打造的硬件级直接映射缓存 (Direct-Mapped Decoded Cache)</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 为什么需要 iCache
+            仿真？</span><span class="badge-orange">性能飞跃引擎</span></div>
+        <div class="text-slate-600 leading-normal"> 在传统解释型模拟器中，指令译码（位移、字段提取、掩码匹配、符号拓展）占据高达 40%~60% 的 CPU 运算时间。 </div>
+        <div class="p-2 bg-orange-50/60 rounded border border-orange-200 mt-1">
+          <div class="font-bold text-orange-800 mb-0.5">HERE 译码缓存实现：</div>
+          <div class="text-slate-700"> 通过 <code>DirectCache&lt;DecodeInstr, 8192&gt;</code>，直接将 PC 映射到预解析好的
+            <code>DecodeInstr</code>，热点指令重复执行几乎等同于查表！ </div>
+        </div>
+      </div>
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1">❖ 缓存表项定义 (DecodeInstr)</div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">#[</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">derive</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">Debug</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Clone</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Copy</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> PartialEq</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Eq</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)]</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> struct</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> DecodeInstr</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> instr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> RiscvInstr</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;"> // 指令枚举标识符</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> info</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> RVInstrInfo</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">  // 预解码的操作数 (rd, rs1, rs2, imm)</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> len</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> WordType</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">      // 指令字节长度 (2 或 4)</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 缓存失效与自修改代码
+            (Zifencei)</span><span class="badge-purple">纪元失效机制</span></div>
+        <div class="text-slate-600 leading-normal"> 当动态链接或 JIT 写回内存并发起 <code>fence.i</code> 时，iCache 必须安全失效： </div>
+        <div class="p-2 bg-slate-50 rounded border border-slate-200 my-1">
+          <div class="text-xs mb-0.5 font-bold"><code
+              class="text-purple-700 font-mono text-[11px] font-bold">icache_epoch += 1</code> <span
+              class="text-slate-800 font-bold">(O(1) 逻辑清空机制)</span></div>
+          <div class="text-slate-600 text-xs"> 每个缓存行记录写入时的 epoch。失效时只需递增全局 <code>icache_epoch</code>，旧缓存行自动判定为 Miss
+            重新加载，免除 8192 表项内存写开销。 </div>
+        </div>
+        <div class="p-2 bg-emerald-50 rounded border border-emerald-200">
+          <div class="text-emerald-800 font-bold mb-0.5">实测命中率观测：</div>
+          <div class="text-slate-600 text-xs"> CoreMark 与 Linux 引导测试退出日志：<br><code
+              class="text-emerald-700 font-bold">INFO here::isa::riscv::executor: iCache hit rate 96.42%</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

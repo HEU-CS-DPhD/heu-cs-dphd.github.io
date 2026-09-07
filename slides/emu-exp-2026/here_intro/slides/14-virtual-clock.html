@@ -1,0 +1,377 @@
+<!--
+  第 14 页: ◈ 模块一：Board 构建 —— 确定性虚拟时钟系统
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块一：Board 构建 —— 确定性虚拟时钟系统</h1>
+  <div class="text-xs text-slate-500 mb-2">解耦时钟步进与宿主机物理墙上时间 (Wall Clock) · 支撑高精度可复现仿真</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 虚拟时钟架构
+            (VirtualClock)</span><span class="badge-blue">确定性单步</span></div>
+        <div class="text-slate-600 leading-normal mb-1"> 时钟推进与宿主物理时间完全解耦，提供硬件级时序基准： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_14_virtual_clock_html" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width: 1099.75px;"
+            viewBox="-8 -8 1099.75 178.75" role="graphics-document document" aria-roledescription="flowchart-v2">
+            <style>
+              #svg_14_virtual_clock_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_14_virtual_clock_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_14_virtual_clock_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_14_virtual_clock_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_14_virtual_clock_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_14_virtual_clock_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_14_virtual_clock_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_14_virtual_clock_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_14_virtual_clock_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_14_virtual_clock_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_14_virtual_clock_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_14_virtual_clock_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_14_virtual_clock_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_14_virtual_clock_html .cluster-label span,
+              #svg_14_virtual_clock_html p {
+                color: #333;
+              }
+
+              #svg_14_virtual_clock_html .label text,
+              #svg_14_virtual_clock_html span,
+              #svg_14_virtual_clock_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_14_virtual_clock_html .node rect,
+              #svg_14_virtual_clock_html .node circle,
+              #svg_14_virtual_clock_html .node ellipse,
+              #svg_14_virtual_clock_html .node polygon,
+              #svg_14_virtual_clock_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_14_virtual_clock_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_14_virtual_clock_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_14_virtual_clock_html .node .label {
+                text-align: center;
+              }
+
+              #svg_14_virtual_clock_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_14_virtual_clock_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_14_virtual_clock_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_14_virtual_clock_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_14_virtual_clock_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_14_virtual_clock_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_14_virtual_clock_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_14_virtual_clock_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_14_virtual_clock_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_14_virtual_clock_html .cluster span,
+              #svg_14_virtual_clock_html p {
+                color: #333;
+              }
+
+              #svg_14_virtual_clock_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_14_virtual_clock_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_14_virtual_clock_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_14_virtual_clock_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_14_virtual_clock_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_14_virtual_clock_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_14_virtual_clock_html_flowchart-circleStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_14_virtual_clock_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_14_virtual_clock_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M129.938,81.375L134.104,81.375C138.271,81.375,146.604,81.375,154.054,81.375C161.504,81.375,168.071,81.375,171.354,81.375L174.638,81.375"
+                    id="L-Cycles-VirtualClock-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Cycles LE-VirtualClock"
+                    style="fill:none;" marker-end="url(#svg_14_virtual_clock_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M320.359,81.375L324.526,81.375C328.693,81.375,337.026,81.375,344.476,81.375C351.926,81.375,358.493,81.375,361.776,81.375L365.059,81.375"
+                    id="L-VirtualClock-Timer-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-VirtualClock LE-Timer"
+                    style="fill:none;" marker-end="url(#svg_14_virtual_clock_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M497.141,81.375L501.307,81.375C505.474,81.375,513.807,81.375,521.257,81.375C528.707,81.375,535.274,81.375,538.557,81.375L541.841,81.375"
+                    id="L-Timer-mtime-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Timer LE-mtime" style="fill:none;"
+                    marker-end="url(#svg_14_virtual_clock_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M647.156,81.375L651.323,81.375C655.49,81.375,663.823,81.375,671.356,81.441C678.89,81.507,685.624,81.639,688.99,81.705L692.357,81.771"
+                    id="L-mtime-cmp-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-mtime LE-cmp"
+                    style="fill:none;" marker-end="url(#svg_14_virtual_clock_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M860.406,81.875L865.823,81.792C871.24,81.708,882.073,81.542,892.106,81.458C902.14,81.375,911.373,81.375,915.99,81.375L920.606,81.375"
+                    id="L-cmp-MTIP-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-cmp LE-MTIP"
+                    style="fill:none;" marker-end="url(#svg_14_virtual_clock_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(892.90625, 81.375)">
+                    <g class="label" transform="translate(-8, -12)">
+                      <foreignObject width="16" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">是</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-Cycles-40" data-node="true"
+                    data-id="Cycles" transform="translate(64.96875, 81.375)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-64.96875" y="-19.5" width="129.9375"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-57.46875, -12)">
+                      <rect></rect>
+                      <foreignObject width="114.9375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Cycles 周期步进</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-VirtualClock-41" data-node="true"
+                    data-id="VirtualClock" transform="translate(250.1484375, 81.375)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-70.2109375" y="-19.5"
+                      width="140.421875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-62.7109375, -12)">
+                      <rect></rect>
+                      <foreignObject width="125.421875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">VirtualClock 累加</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Timer-43" data-node="true"
+                    data-id="Timer" transform="translate(433.75, 81.375)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-63.390625" y="-19.5"
+                      width="126.78125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-55.890625, -12)">
+                      <rect></rect>
+                      <foreignObject width="111.78125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Timer 纳秒折算</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-mtime-45" data-node="true"
+                    data-id="mtime" transform="translate(597.1484375, 81.375)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-50.0078125" y="-19.5"
+                      width="100.015625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-42.5078125, -12)">
+                      <rect></rect>
+                      <foreignObject width="85.015625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">mtime 递增</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-cmp-47" data-node="true" data-id="cmp"
+                    transform="translate(778.53125, 81.375)">
+                    <polygon points="81.375,0 162.75,-81.375 81.375,-162.75 0,-81.375" class="label-container"
+                      transform="translate(-81.375,81.375)" style=""></polygon>
+                    <g class="label" style="" transform="translate(-55.375, -11)">
+                      <rect></rect>
+                      <foreignObject width="110.75" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">&gt;= mtimecmp?</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-MTIP-49" data-node="true" data-id="MTIP"
+                    transform="translate(1004.828125, 81.375)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-78.921875" y="-19.5"
+                      width="157.84375" height="39"></rect>
+                    <g class="label" style="" transform="translate(-71.421875, -12)">
+                      <rect></rect>
+                      <foreignObject width="142.84375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">触发 MTIP 定时中断</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 支撑硬件 Golden Model 验证，两次运行在相同指令序列下产生完全一致的时钟状态。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1">❖ 周期折算与时间同步核心机制</div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>确定性单步仿真</b>：CPU 单步执行与批处理推进时，虚拟时钟依据执行指令精确折算 cycle 计数，不受宿主机 CPU 瞬时负载抖动干扰。 </li>
+          <li><b>多频段动态时钟缩放</b>：支持将虚拟机标准时钟频率（如 10MHz、100MHz）平滑折算为 RISC-V <code>mtime</code> 64 位纳秒级计数器。 </li>
+          <li><b>定时器触发无毛刺</b>：通过比较器 <code>mtime &gt;= mtimecmp</code> 精确拉高中断线，彻底消除宿主机操作系统睡眠定时器的调度延迟误差。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

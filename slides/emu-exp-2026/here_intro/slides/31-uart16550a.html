@@ -1,0 +1,33 @@
+<!--
+  第 31 页: ◈ 模块五：外设体系 —— 工业标准 UART 16550A 仿真
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块五：外设体系 —— 工业标准 UART 16550A 仿真</h1>
+  <div class="text-xs text-slate-500 mb-2">工业级串口控制器仿真 · FIFO 队列、中断驱动与 Terminal 交互</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ UART 16550A
+            寄存器堆</span><span class="badge-blue">src/device/uart16550a/</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>数据缓冲</b>：RBR (接收缓冲只读), THR (发送缓冲只写)。 </li>
+          <li><b>中断控制</b>：IER (中断使能), IIR (中断状态只读)。 </li>
+          <li><b>FIFO 与线路控制</b>：FCR (FIFO 控制), LCR (数据位/校验位/停止位)。 </li>
+          <li><b>状态反馈</b>：LSR (线路状态位：DR 接收就绪, TEMT 发送为空)。 </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 运行机制与终端模式</span><span
+            class="badge-emerald">交互驱动</span></div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>FIFO 缓冲队列与中断</b>：内部维护 16 字节 FIFO。接收到数据时拉高 LSR.DR 并通过 PLIC 触发 IRQ 10 中断通知 CPU。 </li>
+          <li><b>Terminal 原生终端交互</b>：基于 <code>crossterm</code> 接管宿主标准输入，支持 ANSI 转义字符、方向键与键盘快捷键直通。 </li>
+          <li><b>异步无阻塞模式</b>：配合后台 Tokio 线程流式监听标准输入，零卡顿向 CPU 投递字节流。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

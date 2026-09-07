@@ -1,0 +1,72 @@
+<!--
+  第 7 页: ◈ 核心亮点四：双轨调试系统 —— 原生交互式 rvdb 与 GDB RSP
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点四：双轨调试系统 —— 原生交互式 rvdb 与 GDB RSP</h1>
+  <div class="text-xs text-slate-500 mb-1">兼具轻量内省与工业生态：自研 ELF 符号解析 REPL + 标准 GDB Remote Serial Protocol</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 双轨调试系统架构分工</span><span
+            class="badge-purple">src/rvdb/ &amp; src/gdb/</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>对比维度</th>
+              <th>原生 rvdb 调试器</th>
+              <th>GDB Remote Stub</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>定位目标</b></td>
+              <td>零依赖、快速内省控制台</td>
+              <td>标准工具链与 IDE 接入</td>
+            </tr>
+            <tr>
+              <td><b>通信介质</b></td>
+              <td>终端 Stdin / Stdout (noline)</td>
+              <td>TCP :1234 / Unix Socket</td>
+            </tr>
+            <tr>
+              <td><b>符号解析</b></td>
+              <td>内置 ELF SymTab 符号映射</td>
+              <td>客户端 GDB/DWARF 源码关联</td>
+            </tr>
+            <tr>
+              <td><b>硬件观察</b></td>
+              <td>CSR/时钟/物理MMIO直观读写</td>
+              <td>标准寄存器池与内存读写</td>
+            </tr>
+            <tr>
+              <td><b>生态兼容</b></td>
+              <td>独立原生 CLI &amp; WASM 网页端</td>
+              <td>VS Code / CLion / GDB</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-slate-500 text-xs mt-1"><code>-g</code> 启动内置 rvdb；<code>-G</code> 启动标准 GDB Stub，互不冲突。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 核心工程特性与实战价值</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>自研轻量交互式 <code>rvdb</code></b>：
+            支持符号级断点（<code>b main</code>）、单步反汇编（<code>si</code>）、虚拟/物理地址翻译（<code>trans</code>）、执行流跟踪（<code>ftrace</code>），即使没有
+            GDB 工具链也能单步排查。 </li>
+          <li><b>工业级 GDB Remote Stub (0.7.10)</b>： 完整实现 RISC-V 64 RSP
+            远程调试协议，支持软件断点（<code>Z0</code>）、硬件断点（<code>Z1</code>）、线程查询与寄存器组读写。 </li>
+          <li><b>内核级调试实操验证</b>： 支持通过 VS Code 连入正运行 OpenSBI 与 Linux 内核的模拟器，下断点到 <code>start_kernel</code> 追踪内核启动全程。 </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-blue-50/70 border border-blue-200 rounded-lg">
+        <div class="font-bold text-blue-800 mb-0.5 text-xs">❖ 脚本化自动化调试</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          支持 <code>-S script.rvdb</code> 预设命令自动化执行，在回归测试与 CI 中可实现无头静默单步验证与错误自动捕捉。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

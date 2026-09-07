@@ -1,0 +1,36 @@
+<!--
+  第 22 页: ◈ 模块二：后端执行扩展 —— 单双精度浮点单元 (RV_F &amp; RV_D)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 单双精度浮点单元 (RV_F &amp; RV_D)</h1>
+  <div class="text-xs text-slate-500 mb-2">基于 <code>rustc_apfloat</code> 精准建模：严格符合 IEEE 754 硬件对齐规范</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 浮点寄存器与 NaN-boxing
+            机制</span><span class="badge-blue">32 个 64 位浮点堆</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>32 个浮点寄存器 (f0~f31)</b>：统一为 64 位宽度，兼容单双精度计算。 </li>
+          <li><b>标准 NaN-boxing 编码</b>：单精度写入 64 位浮点寄存器时，高 32 位必须全置为 1；读取单精度若高 32 位非全 1 则安全视为非法并返回规范静默 NaN。 </li>
+          <li><b>动态舍入模式 (Rounding Modes)</b>：支持 RNE (就近偶数)、RTZ (向零)、RDN (向下)、RUP (向上)、RMM (就近最大值)。 </li>
+          <li><b>浮点控制状态寄存器 (fcsr)</b>：精准更新 NV (无效)、DZ (除零)、OF (上溢)、UF (下溢)、NX (不精确) 5 大异常标志。 </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 浮点运算指令矩阵</span><span
+            class="badge-emerald">科学计算支持</span></div>
+        <ul class="text-slate-600 space-y-1 mt-0.5">
+          <li><b>基本四则运算</b>：<code>FADD</code>, <code>FSUB</code>, <code>FMUL</code>, <code>FDIV</code>,
+            <code>FSQRT</code> (平方根)。 </li>
+          <li><b>融合乘加 (FMA)</b>：<code>FMADD</code>, <code>FMSUB</code>, <code>FNMSUB</code>,
+            <code>FNMADD</code>，一步完成乘加四舍五入，消除中间截断精度损失。 </li>
+          <li><b>符号注入与极值</b>：<code>FSGNJ / FSGNJN / FSGNJX</code> 符号位提取；<code>FMIN / FMAX</code> 精确处理 NaN。 </li>
+          <li><b>类型转换与分类</b>：<code>FCVT</code> (整型/浮点双向无缝转换)；<code>FCLASS</code> 检查正负无穷、规范数、非规范数、非数。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

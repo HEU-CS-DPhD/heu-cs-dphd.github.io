@@ -1,0 +1,363 @@
+<!--
+  第 32 页: ◈ 模块五：外设体系 —— VirtIO 虚拟块存储 (VirtIO Block)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块五：外设体系 —— VirtIO 虚拟块存储 (VirtIO Block)</h1>
+  <div class="text-xs text-slate-500 mb-2">基于现代 VirtIO v2 规范 · 分裂 VirtQueue 环形队列异步读写 Linux 磁盘镜像</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ VirtQueue
+            三环交互流转模型</span><span class="badge-orange">Linux RootFS 依托</span></div>
+        <div class="text-slate-600 leading-normal mb-0.5"> 驱动与模拟器共享三级环形队列完成高性能块 I/O： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_32_virtio_block_html" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width: 870.1875px;"
+            viewBox="-8 -8 870.1875 258.75" role="graphics-document document" aria-roledescription="flowchart-v2">
+            <style>
+              #svg_32_virtio_block_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_32_virtio_block_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_32_virtio_block_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_32_virtio_block_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_32_virtio_block_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_32_virtio_block_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_32_virtio_block_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_32_virtio_block_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_32_virtio_block_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_32_virtio_block_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_32_virtio_block_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_32_virtio_block_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_32_virtio_block_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_32_virtio_block_html .cluster-label span,
+              #svg_32_virtio_block_html p {
+                color: #333;
+              }
+
+              #svg_32_virtio_block_html .label text,
+              #svg_32_virtio_block_html span,
+              #svg_32_virtio_block_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_32_virtio_block_html .node rect,
+              #svg_32_virtio_block_html .node circle,
+              #svg_32_virtio_block_html .node ellipse,
+              #svg_32_virtio_block_html .node polygon,
+              #svg_32_virtio_block_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_32_virtio_block_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_32_virtio_block_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_32_virtio_block_html .node .label {
+                text-align: center;
+              }
+
+              #svg_32_virtio_block_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_32_virtio_block_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_32_virtio_block_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_32_virtio_block_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_32_virtio_block_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_32_virtio_block_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_32_virtio_block_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_32_virtio_block_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_32_virtio_block_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_32_virtio_block_html .cluster span,
+              #svg_32_virtio_block_html p {
+                color: #333;
+              }
+
+              #svg_32_virtio_block_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_32_virtio_block_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_32_virtio_block_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_32_virtio_block_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_32_virtio_block_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_32_virtio_block_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_32_virtio_block_html_flowchart-circleStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_32_virtio_block_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_32_virtio_block_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters">
+                  <g class="cluster default flowchart-label" id="Device">
+                    <rect style="" rx="0" ry="0" x="0" y="129" width="854.1875" height="113.75"></rect>
+                    <g class="cluster-label" transform="translate(381.2109375, 129)">
+                      <foreignObject width="91.765625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">HERE 仿真层</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="cluster default flowchart-label" id="Driver">
+                    <rect style="" rx="0" ry="0" x="0" y="0" width="555.5" height="109"></rect>
+                    <g class="cluster-label" transform="translate(229.6640625, 0)">
+                      <foreignObject width="96.171875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Guest 驱动层</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="edgePaths">
+                  <path
+                    d="M204.453,54.5L214.434,54.5C224.414,54.5,244.375,54.5,263.453,54.5C282.53,54.5,300.724,54.5,309.822,54.5L318.919,54.5"
+                    id="L-Desc-Avail-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Desc LE-Avail"
+                    style="fill:none;" marker-end="url(#svg_32_virtio_block_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M530.5,54.5L534.667,54.5C538.833,54.5,547.167,54.5,562.426,74.125C577.685,93.75,599.87,133,621.177,153.819C642.485,174.639,662.915,177.027,673.13,178.222L683.345,179.416"
+                    id="L-Avail-Worker-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Avail LE-Worker"
+                    style="fill:none;" marker-end="url(#svg_32_virtio_block_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M688.609,197.11L677.517,198.509C666.424,199.907,644.24,202.703,622.055,204.102C599.87,205.5,577.685,205.5,545.236,205.5C512.786,205.5,470.073,205.5,421.546,205.5C373.018,205.5,318.677,205.5,282.195,204.426C245.713,203.353,227.091,201.206,217.78,200.132L208.468,199.058"
+                    id="L-Worker-Used-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Worker LE-Used" style="fill:none;"
+                    marker-end="url(#svg_32_virtio_block_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M203.203,178.788L213.392,177.698C223.581,176.609,243.958,174.429,268.026,163.315C292.093,152.201,319.851,132.152,333.73,122.128L347.608,112.103"
+                    id="L-Used-Driver-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Used LE-Driver" style="fill:none;"
+                    marker-end="url(#svg_32_virtio_block_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(622.0546875, 172.25)">
+                    <g class="label" transform="translate(-41.5546875, -12)">
+                      <foreignObject width="83.109375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">MMIO 通知</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(283.2003, 158.62448)">
+                    <g class="label" transform="translate(-34.8828125, -12)">
+                      <foreignObject width="69.765625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">PLIC 中断</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-Used-97" data-node="true" data-id="Used"
+                    transform="translate(114.7265625, 188.25)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-88.4765625" y="-19.5"
+                      width="176.953125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-80.9765625, -12)">
+                      <rect></rect>
+                      <foreignObject width="161.953125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">4. 已完成环 Used Ring</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Worker-95" data-node="true"
+                    data-id="Worker" transform="translate(758.8984375, 188.25)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-70.2890625" y="-19.5"
+                      width="140.578125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-62.7890625, -12)">
+                      <rect></rect>
+                      <foreignObject width="125.578125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">3. Tokio 异步刷盘</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Avail-93" data-node="true"
+                    data-id="Avail" transform="translate(427.359375, 54.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-103.140625" y="-19.5"
+                      width="206.28125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-95.640625, -12)">
+                      <rect></rect>
+                      <foreignObject width="191.28125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">2. 待处理环 Available Ring</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Desc-92" data-node="true" data-id="Desc"
+                    transform="translate(114.7265625, 54.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-89.7265625" y="-19.5"
+                      width="179.453125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-82.2265625, -12)">
+                      <rect></rect>
+                      <foreignObject width="164.453125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">1. 描述符表 Descriptor</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 零等待 MMIO 访问模式，主核发起 I/O 后立即返回继续指令执行。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 块设备特性与 Linux 挂载</span><span
+            class="badge-emerald">特性位协商</span></div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>异步文件 I/O 驱动</b>：基于 <code>tokio::fs::File</code> 执行非阻塞 <code>seek/read/write</code>，高速支撑 Linux Ext4
+            磁盘镜像读写。 </li>
+          <li><b>标准特性位协商</b>：支持 <code>VIRTIO_BLK_F_BLOCK_SIZE</code> (512 字节标准扇区) 与 <code>VIRTIO_BLK_F_FLUSH</code>
+            脏缓存刷盘。 </li>
+          <li><b>全系统落地运行</b>：通过 DTS 挂载 <code>/dev/vda</code>，成功引导 Linux 并运行 BusyBox 与用户态二进制程序。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
