@@ -1,0 +1,62 @@
+<!--
+  第 4 页: ◈ 核心亮点二：RVV 1.0 向量引擎 —— 泛型单态化与精准异常
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点二：RVV 1.0 向量引擎 —— 泛型单态化与精准异常</h1>
+  <div class="text-xs text-slate-500 mb-1">抽象向量寄存器组视图，利用 Rust 零成本单态化展开算子（注：向量浮点扩展尚在迭代）</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 向量寄存器组抽象与 Trait
+            单态化</span><span class="badge-emerald">src/isa/riscv/vector/</span></div>
+        <div class="text-slate-600 leading-normal mb-1"><code>VGFRef</code> / <code>VGFRefMut</code> 抽象 LMUL
+          寄存器成组与连续段访存： </div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">// 零拷贝抽象动态 LMUL(1..8) 与 NFIELDS 分段</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">crate</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> struct</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VGFRef</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;'</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">a</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    value</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">'</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">a</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> [</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">],</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> sew</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> lmul</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> seg</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span>
+<span class="line"><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">// 算子全排列泛型单态化 (Widening / Narrowing / MultiplyAdd)</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">in</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> crate</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">isa</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">riscv</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> trait</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VectorOpFixedPointVV</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> exec</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">vs1</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">VGFRef</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> vs2</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">VGFRef</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> vd</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;mut</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VGFRefMut</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">            mask</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">VecOpMask</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> round</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> FixedPointRoundingMode</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;"> </span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">            -&gt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Result</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">bool</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Exception</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;;</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-500 text-xs mt-1"><code>integer_impl.rs</code> 2600+ 行无分支泛型模板，编译期自动内联展开。 </div>
+      </div>
+      <div class="p-2 bg-purple-50/70 border border-purple-200 rounded-lg">
+        <div class="font-bold text-purple-800 mb-0.5 text-xs">❖ 精准异常恢复支持 (vstart Support)</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          长向量访存若在第 <i>i</i> 个元素发生页异常，精准记录 <code>fault_index</code> 并写回 <code>vstart</code>，Guest OS 换入页面后可无缝原位继续执行。
+        </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 核心工程成果与实现边界说明</span></div>
+        <ul class="text-slate-600 space-y-1 text-xs">
+          <li><b>全套整数向量运算就绪</b>：支持加减、乘除、移位、Widening 扩展与 Narrowing 窄化操作，覆盖 vv、vx、vi 全变体。 </li>
+          <li><b>工业级定点数饱和算法</b>：严格实现 <code>RoundToNearestUp/Even</code> 等 4 种舍入模式，正确维护 <code>vxsat</code> 饱和标志位。 </li>
+          <li><b>复杂跨步与索引访存</b>：支持单位跨步、非单位跨步（Stride）与无序索引（Indexed）寻址。 </li>
+          <li><b class="text-amber-700">实现边界说明（客观说明）</b>： 当前完整覆盖整数向量与定点数向量扩展；<b>向量单双精度浮点（VFP）指令暂未完成</b>，目前处于活跃迭代开发中。
+          </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-slate-100 border border-slate-300 rounded-lg">
+        <div class="font-bold text-slate-800 mb-0.5 text-xs">❖ 单元测试保障体系</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          内置 <code>vector_kernels.c</code> 矩阵计算与算术测试，配合单元测试套件覆盖向量寄存器重叠溢出、边界掩码与异常陷阱。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,406 @@
+<!--
+  第 21 页: ◈ 模块二：后端执行扩展 —— 原子操作指令集 (RV_A)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 原子操作指令集 (RV_A)</h1>
+  <div class="text-xs text-slate-500 mb-2">多核并发同步原语基石：LR/SC 物理保留集机制与 9 大 AMO 原子读改写</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ LR/SC 保留集生命周期
+            (Reservation)</span><span class="badge-emerald">无锁同步核心</span></div>
+        <div class="text-slate-600 leading-normal mb-0.5"> 支撑内核自旋锁与无锁队列的核心硬件机制： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_21_rv_a_atomic_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 1161.953125px;" viewBox="-8 -8 1161.953125 214" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_21_rv_a_atomic_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_21_rv_a_atomic_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_21_rv_a_atomic_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_21_rv_a_atomic_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_21_rv_a_atomic_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_21_rv_a_atomic_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_21_rv_a_atomic_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_21_rv_a_atomic_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_21_rv_a_atomic_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_21_rv_a_atomic_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_21_rv_a_atomic_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .cluster-label span,
+              #svg_21_rv_a_atomic_html p {
+                color: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .label text,
+              #svg_21_rv_a_atomic_html span,
+              #svg_21_rv_a_atomic_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .node rect,
+              #svg_21_rv_a_atomic_html .node circle,
+              #svg_21_rv_a_atomic_html .node ellipse,
+              #svg_21_rv_a_atomic_html .node polygon,
+              #svg_21_rv_a_atomic_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_21_rv_a_atomic_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_21_rv_a_atomic_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_21_rv_a_atomic_html .node .label {
+                text-align: center;
+              }
+
+              #svg_21_rv_a_atomic_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_21_rv_a_atomic_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_21_rv_a_atomic_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_21_rv_a_atomic_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_21_rv_a_atomic_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_21_rv_a_atomic_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_21_rv_a_atomic_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_21_rv_a_atomic_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_21_rv_a_atomic_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_21_rv_a_atomic_html .cluster span,
+              #svg_21_rv_a_atomic_html p {
+                color: #333;
+              }
+
+              #svg_21_rv_a_atomic_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_21_rv_a_atomic_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_21_rv_a_atomic_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-circleStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-crossEnd" class="marker cross flowchart" viewBox="0 0 11 11"
+                refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_21_rv_a_atomic_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M168.281,99L172.448,99C176.615,99,184.948,99,192.398,99C199.848,99,206.415,99,209.698,99L212.981,99"
+                    id="L-LR-Set-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-LR LE-Set"
+                    style="fill:none;" marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M377.281,99L381.448,99C385.615,99,393.948,99,401.481,99.066C409.015,99.132,415.749,99.264,419.115,99.33L422.482,99.396"
+                    id="L-Set-Monitor-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Set LE-Monitor" style="fill:none;"
+                    marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M605.433,79.151L620.907,75.043C636.382,70.934,667.332,62.717,694.09,58.609C720.848,54.5,743.415,54.5,754.698,54.5L765.981,54.5"
+                    id="L-Monitor-Inval-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Monitor LE-Inval"
+                    style="fill:none;" marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M605.433,119.849L620.907,123.791C636.382,127.732,667.332,135.616,697.961,139.558C728.59,143.5,758.899,143.5,774.053,143.5L789.208,143.5"
+                    id="L-Monitor-Valid-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Monitor LE-Valid"
+                    style="fill:none;" marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M921.508,143.5L929.546,143.5C937.583,143.5,953.659,143.5,964.98,143.5C976.301,143.5,982.868,143.5,986.151,143.5L989.434,143.5"
+                    id="L-Valid-SC_OK-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Valid LE-SC_OK" style="fill:none;"
+                    marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M944.734,54.5L948.901,54.5C953.068,54.5,961.401,54.5,968.851,54.5C976.301,54.5,982.868,54.5,986.151,54.5L989.434,54.5"
+                    id="L-Inval-SC_FAIL-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Inval LE-SC_FAIL"
+                    style="fill:none;" marker-end="url(#svg_21_rv_a_atomic_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(698.28125, 54.5)">
+                    <g class="label" transform="translate(-48, -12)">
+                      <foreignObject width="96" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">其他核写命中</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(698.28125, 143.5)">
+                    <g class="label" transform="translate(-40, -12)">
+                      <foreignObject width="80" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">无写入冲突</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-LR-60" data-node="true" data-id="LR"
+                    transform="translate(84.140625, 99)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-84.140625" y="-19.5"
+                      width="168.28125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-76.640625, -12)">
+                      <rect></rect>
+                      <foreignObject width="153.28125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">LR.W / LR.D 独占加载</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Set-61" data-node="true" data-id="Set"
+                    transform="translate(297.78125, 99)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-79.5" y="-19.5" width="159"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-72, -12)">
+                      <rect></rect>
+                      <foreignObject width="144" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">注册物理地址保留集</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Monitor-63" data-node="true"
+                    data-id="Monitor" transform="translate(526.28125, 99)">
+                    <polygon points="99,0 198,-99 99,-198 0,-99" class="label-container" transform="translate(-99,99)"
+                      style=""></polygon>
+                    <g class="label" style="" transform="translate(-72, -12)">
+                      <rect></rect>
+                      <foreignObject width="144" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">监测总线并发写冲突</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Inval-65" data-node="true"
+                    data-id="Inval" transform="translate(858.0078125, 54.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-86.7265625" y="-19.5"
+                      width="173.453125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-79.2265625, -12)">
+                      <rect></rect>
+                      <foreignObject width="158.453125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">保留集失效 Invalidate</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Valid-67" data-node="true"
+                    data-id="Valid" transform="translate(858.0078125, 143.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-63.5" y="-19.5" width="127"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-56, -12)">
+                      <rect></rect>
+                      <foreignObject width="112" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">保留集维持有效</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-SC_OK-69" data-node="true"
+                    data-id="SC_OK" transform="translate(1070.34375, 143.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-75.609375" y="-19.5"
+                      width="151.21875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-68.109375, -12)">
+                      <rect></rect>
+                      <foreignObject width="136.21875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">SC.W/D 成功返回 0</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-SC_FAIL-71" data-node="true"
+                    data-id="SC_FAIL" transform="translate(1070.34375, 54.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-75.609375" y="-19.5"
+                      width="151.21875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-68.109375, -12)">
+                      <rect></rect>
+                      <foreignObject width="136.21875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">SC.W/D 失败返回 1</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 内部维护 <code>reservation_set</code>，任意核向该物理地址写入则原子失效。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 全系 AMO 原子内存操作原语</span><span
+            class="badge-blue">原子读改写</span></div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>数据交换</b>：<code>AMOSWAP.W/D</code> 单步原子交换寄存器与内存数据。 </li>
+          <li><b>算术累加</b>：<code>AMOADD.W/D</code> 原子加法，无锁实现全局计数器。 </li>
+          <li><b>逻辑运算</b>：<code>AMOXOR</code>, <code>AMOAND</code>, <code>AMOOR</code> 驱动并发位图与标志位更新。 </li>
+          <li><b>极值比较</b>：<code>AMOMIN / AMOMAX</code> (有符号极值), <code>AMOMINU / AMOMAXU</code> (无符号极值)。 </li>
+          <li><b>内存屏障语义</b>：支持指令携带 <code>aq</code> (Acquire) 与 <code>rl</code> (Release) 乱序重排屏障属性。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

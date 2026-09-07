@@ -1,0 +1,431 @@
+<!--
+  第 11 页: ◈ 核心亮点七：前沿演进 —— 自研 x86-64 JIT 动态编译引擎
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点七：前沿演进 —— 自研 x86-64 JIT 动态编译引擎</h1>
+  <div class="text-xs text-slate-500 mb-1">突破纯解释执行性能天花板：自研轻量 IR 与寄存器分配器，指令膨胀比从 120 骤降至 50</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light flex-1 flex flex-col justify-between">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ JIT
+            翻译流水线与基本块缓存架构</span><span class="badge-blue">src/jit/ (branch: jit)</span></div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_11_x86_jit_compiler_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 1010.515625px;" viewBox="-8 -8 1010.515625 55" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_11_x86_jit_compiler_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_11_x86_jit_compiler_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_11_x86_jit_compiler_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_11_x86_jit_compiler_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_11_x86_jit_compiler_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_11_x86_jit_compiler_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_11_x86_jit_compiler_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_11_x86_jit_compiler_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_11_x86_jit_compiler_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_11_x86_jit_compiler_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_11_x86_jit_compiler_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .cluster-label span,
+              #svg_11_x86_jit_compiler_html p {
+                color: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .label text,
+              #svg_11_x86_jit_compiler_html span,
+              #svg_11_x86_jit_compiler_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .node rect,
+              #svg_11_x86_jit_compiler_html .node circle,
+              #svg_11_x86_jit_compiler_html .node ellipse,
+              #svg_11_x86_jit_compiler_html .node polygon,
+              #svg_11_x86_jit_compiler_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_11_x86_jit_compiler_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_11_x86_jit_compiler_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_11_x86_jit_compiler_html .node .label {
+                text-align: center;
+              }
+
+              #svg_11_x86_jit_compiler_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_11_x86_jit_compiler_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_11_x86_jit_compiler_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_11_x86_jit_compiler_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_11_x86_jit_compiler_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_11_x86_jit_compiler_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_11_x86_jit_compiler_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_11_x86_jit_compiler_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_11_x86_jit_compiler_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html .cluster span,
+              #svg_11_x86_jit_compiler_html p {
+                color: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_11_x86_jit_compiler_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_11_x86_jit_compiler_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-pointStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+                orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-circleStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_11_x86_jit_compiler_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M116.188,19.5L120.354,19.5C124.521,19.5,132.854,19.5,140.304,19.5C147.754,19.5,154.321,19.5,157.604,19.5L160.888,19.5"
+                    id="L-RISCV-IR-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-RISCV LE-IR"
+                    style="fill:none;" marker-end="url(#svg_11_x86_jit_compiler_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M264.734,19.5L268.901,19.5C273.068,19.5,281.401,19.5,288.851,19.5C296.301,19.5,302.868,19.5,306.151,19.5L309.434,19.5"
+                    id="L-IR-Reg-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-IR LE-Reg"
+                    style="fill:none;" marker-end="url(#svg_11_x86_jit_compiler_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M444.922,19.5L449.089,19.5C453.255,19.5,461.589,19.5,469.039,19.5C476.489,19.5,483.055,19.5,486.339,19.5L489.622,19.5"
+                    id="L-Reg-Emit-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Reg LE-Emit"
+                    style="fill:none;" marker-end="url(#svg_11_x86_jit_compiler_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M621.766,19.5L625.932,19.5C630.099,19.5,638.432,19.5,645.882,19.5C653.332,19.5,659.899,19.5,663.182,19.5L666.466,19.5"
+                    id="L-Emit-Cache-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Emit LE-Cache"
+                    style="fill:none;" marker-end="url(#svg_11_x86_jit_compiler_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M825.703,19.5L829.87,19.5C834.036,19.5,842.37,19.5,849.82,19.5C857.27,19.5,863.836,19.5,867.12,19.5L870.403,19.5"
+                    id="L-Cache-Exec-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Cache LE-Exec"
+                    style="fill:none;" marker-end="url(#svg_11_x86_jit_compiler_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-RISCV-22" data-node="true"
+                    data-id="RISCV" transform="translate(58.09375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-58.09375" y="-19.5" width="116.1875"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-50.59375, -12)">
+                      <rect></rect>
+                      <foreignObject width="101.1875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">RISC-V 基本块</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-IR-23" data-node="true" data-id="IR"
+                    transform="translate(215.4609375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-49.2734375" y="-19.5"
+                      width="98.546875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-41.7734375, -12)">
+                      <rect></rect>
+                      <foreignObject width="83.546875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">中间表示 IR</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Reg-25" data-node="true" data-id="Reg"
+                    transform="translate(379.828125, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-65.09375" y="-19.5" width="130.1875"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-57.59375, -12)">
+                      <rect></rect>
+                      <foreignObject width="115.1875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">RAII 寄存器分配</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Emit-27" data-node="true" data-id="Emit"
+                    transform="translate(558.34375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-63.421875" y="-19.5"
+                      width="126.84375" height="39"></rect>
+                    <g class="label" style="" transform="translate(-55.921875, -12)">
+                      <rect></rect>
+                      <foreignObject width="111.84375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">X86 机器码发射</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Cache-29" data-node="true"
+                    data-id="Cache" transform="translate(748.734375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-76.96875" y="-19.5" width="153.9375"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-69.46875, -12)">
+                      <rect></rect>
+                      <foreignObject width="138.9375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">4096组 8-Way 缓存</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Exec-31" data-node="true" data-id="Exec"
+                    transform="translate(935.109375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-59.40625" y="-19.5" width="118.8125"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-51.90625, -12)">
+                      <rect></rect>
+                      <foreignObject width="103.8125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">宿主 CPU 执行</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-600 leading-normal text-[11px] mt-1"><b>寄存器状态追踪 (HostRegState)</b>：精准追踪 x86
+          物理寄存器绑定，脏位管理与自动溢出（Spill）。 </div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff; font-size: 10px; line-height: 1.35;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">struct</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> HostRegState</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    host</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> X86Reg</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">, </span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">guest</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Option</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    dirty</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> bool</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">, </span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">refcount</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span>
+<span class="line"><span style="--shiki-dark: #758575DD; --shiki-light: #A0ADA0;">// Callee: RBX, R12-R15 | Caller: RAX, R10-R11</span></span></code></pre>
+          <button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+      </div>
+      <div class="p-2 bg-blue-50/70 border border-blue-200 rounded-lg">
+        <div class="font-bold text-blue-800 mb-0.5 text-xs">❖ 纯 Rust 轻量原生后端</div>
+        <div class="text-slate-600 text-xs leading-relaxed"> 不依赖庞大的 LLVM 或 libgccjit 重型依赖，自研微型机器码发射器，毫秒级即发即执行。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light flex-1 flex flex-col justify-between">
+        <div>
+          <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 宿主指令膨胀比演进 (Expansion
+              Ratio)</span></div>
+          <table class="w-full text-[10px]">
+            <thead>
+              <tr>
+                <th>运行模式</th>
+                <th>指令膨胀比</th>
+                <th>关键机制与开销来源</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>HERE 纯解释器</b></td>
+                <td><span class="badge-orange" style="min-width: 78px; justify-content: center; white-space: nowrap;">~120 : 1</span></td>
+                <td>每周期存在取指、多级译码、动态函数分派开销</td>
+              </tr>
+              <tr class="bg-blue-50/70 font-bold">
+                <td><b>HERE 初版 JIT</b></td>
+                <td><span class="badge-blue" style="min-width: 78px; justify-content: center; white-space: nowrap;">~50 : 1</span></td>
+                <td>RISCV 拆分基本块 -> IR -> 直译为机器码</td>
+              </tr>
+              <tr class="text-slate-500">
+                <td><b>QEMU TCG (对标)</b></td>
+                <td><span class="badge-slate" style="min-width: 78px; justify-content: center; white-space: nowrap;">15~20:1</span></td>
+                <td>基本块直接跳转链接 (Chaining) 与微操作深度融合</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-slate-600 leading-normal text-xs mt-2 space-y-1">
+            <div><b>IR 架构完成</b>：完成基本块指令翻译、通用 ALU/访存/分支翻译与 RAII 寄存器保护。</div>
+            <div><b>性能提升 58%+</b>：将原本解释执行的高额运行时函数调用分摊抹平。</div>
+          </div>
+        </div>
+        <div class="text-slate-500 text-[10px] mt-1 border-t border-slate-100 pt-1"> 当前分支代码仍在持续迭代，正向 15~20 膨胀比工业级标杆稳步优化。
+        </div>
+      </div>
+      <div class="p-2 bg-purple-50/70 border border-purple-200 rounded-lg">
+        <div class="font-bold text-purple-800 mb-0.5 text-xs">❖ 正在开发与推进中功能 (WIP)</div>
+        <div class="text-slate-600 text-xs leading-relaxed"> 部分代码位于 <code>jit</code> 分支（IR 已完成），控制流直接链接（Block
+          Chaining）与常量传播正处于活跃迭代中。 </div>
+      </div>
+    </div>
+  </div>
+</div>

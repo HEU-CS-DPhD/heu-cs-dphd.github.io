@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" width="100%" height="100%">
+  <defs>
+    <filter id="boxShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#b91c1c"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#d97706"/>
+    </marker>
+    <marker id="arrowSlate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="440" fill="#f8fafc" rx="14"/>
+
+  <!-- Top Title Bar -->
+  <text x="36" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="16" fill="#0f172a">CPU 前端：分级译码管线与 iCache 高速缓存流转图</text>
+  <text x="36" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">Raw Instruction → iCache Lookup → Multi-Tier Staged Decoding → DecodeInstr</text>
+
+  <!-- Step 0: Raw Instruction Fetch & PC -->
+  <rect x="36" y="76" width="160" height="106" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#boxShadow)"/>
+  <rect x="36" y="76" width="160" height="24" rx="10" fill="#e2e8f0"/>
+  <text x="116" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11" fill="#334155" text-anchor="middle">1. 取指与 PC 输入</text>
+  <text x="48" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#0f172a">PC: 0x8000_1234</text>
+  <text x="48" y="138" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#64748b">RawInstr: 16 / 32 bit</text>
+  <text x="48" y="156" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#2563eb">Shift: 1 bit (halfword)</text>
+
+  <!-- Arrow from Fetch to iCache -->
+  <path d="M 196 126 L 258 126" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Step 1: iCache Direct Cache Block -->
+  <rect x="268" y="74" width="242" height="108" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.8" filter="url(#boxShadow)"/>
+  <rect x="268" y="74" width="242" height="26" rx="10" fill="#fef3c7"/>
+  <text x="389" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="12" fill="#b45309" text-anchor="middle">iCache 译码缓存查询</text>
+  <text x="282" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#92400e">DirectCache&lt;DecodeInstr, 8192&gt;</text>
+  <text x="282" y="138" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#b45309">Tag Match + Epoch 有效性校验</text>
+  <text x="282" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#15803d">命中 (Hit ~95%): 直接交付执行</text>
+
+  <!-- ZERO-CROSSING TOP INTERCONNECT -->
+  <!-- 1. Hit Path (Left -> Right) -->
+  <path d="M 510 104 L 668 104" stroke="#10b981" stroke-width="2.5" stroke-dasharray="4 2" fill="none" marker-end="url(#arrowGreen)"/>
+  <text x="590" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#15803d" text-anchor="middle">Cache Hit (零译码开销)</text>
+
+  <!-- 2. Invalidation Path (Right -> Left) -->
+  <path d="M 678 136 L 520 136" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 2" fill="none" marker-end="url(#arrowRed)"/>
+  <text x="590" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#b91c1c" text-anchor="middle">fence.i 递增 Epoch 逻辑失效</text>
+
+  <!-- Miss Path down to Multi-tier Decoder -->
+  <path d="M 330 182 L 330 226" stroke="#d97706" stroke-width="2" fill="none" marker-end="url(#arrowAmber)"/>
+  <text x="262" y="206" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#d97706">Cache Miss 触发</text>
+
+  <!-- Step 2: Multi-Tier Decoder Container -->
+  <rect x="36" y="228" width="590" height="190" rx="12" fill="#ffffff" stroke="#93c5fd" stroke-width="1.6" filter="url(#boxShadow)"/>
+  <rect x="36" y="228" width="590" height="28" rx="12" fill="#eff6ff"/>
+  <text x="52" y="247" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="12" fill="#1d4ed8">分级分流译码器架构 (Multi-Tier Decoder Pipeline)</text>
+
+  <!-- Tier 1: Compressed Decoder -->
+  <rect x="52" y="266" width="162" height="124" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <rect x="52" y="266" width="162" height="22" rx="8" fill="#e2e8f0"/>
+  <text x="133" y="282" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#1e293b" text-anchor="middle">Tier 1: 压缩指令分流</text>
+  <text x="64" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="600" fill="#2563eb">instr.len() == 2</text>
+  <text x="64" y="324" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">CompressedDecoder</text>
+  <text x="64" y="342" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">C0, C1, C2 象限快速查表</text>
+  <text x="64" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#16a34a">16-bit RVC 专用硬件加速</text>
+
+  <!-- Waterfall Arrow 1: Tier 1 -> Tier 2 -->
+  <path d="M 214 328 L 230 328" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrowSlate)"/>
+  <text x="222" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#64748b" text-anchor="middle">非RVC</text>
+
+  <!-- Tier 2: Funct Decoder -->
+  <rect x="236" y="266" width="180" height="124" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <rect x="236" y="266" width="180" height="22" rx="8" fill="#e2e8f0"/>
+  <text x="326" y="282" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#1e293b" text-anchor="middle">Tier 2: 功能码直查表</text>
+  <text x="246" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="600" fill="#2563eb">funct_decoder::Decoder</text>
+  <text x="246" y="324" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">[opcode][funct3][funct7]</text>
+  <text x="246" y="342" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">O(1) 数组下标直击表项</text>
+  <text x="246" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#16a34a">覆盖 90%+ 核心 32 位指令</text>
+
+  <!-- Waterfall Arrow 2: Tier 2 -> Tier 3 -->
+  <path d="M 416 328 L 432 328" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrowSlate)"/>
+  <text x="424" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#64748b" text-anchor="middle">未命中</text>
+
+  <!-- Tier 3: Mask Decoder -->
+  <rect x="438" y="266" width="176" height="124" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <rect x="438" y="266" width="176" height="22" rx="8" fill="#e2e8f0"/>
+  <text x="526" y="282" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#1e293b" text-anchor="middle">Tier 3: 掩码匹配兜底</text>
+  <text x="448" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="600" fill="#2563eb">mask_decoder::MaskDecoder</text>
+  <text x="448" y="324" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">bitmask &amp; pattern match</text>
+  <text x="448" y="342" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">处理特殊编码及扩展指令</text>
+  <text x="448" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#b45309">RVV 复杂指令编码格式兜底</text>
+
+  <!-- Path: Cache Fill back up to iCache (clean, separated) -->
+  <path d="M 450 228 L 450 188" stroke="#d97706" stroke-width="2" stroke-dasharray="4 2" fill="none" marker-end="url(#arrowAmber)"/>
+  <text x="450" y="208" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#d97706" text-anchor="middle">Cache Fill 回填</text>
+
+  <!-- Path: Miss Decode Direct to Execution (Clean orthogonal path through x=652) -->
+  <path d="M 626 320 L 652 320 L 652 160 L 670 160" stroke="#3b82f6" stroke-width="2.2" fill="none" marker-end="url(#arrow)"/>
+  <rect x="636" y="210" width="86" height="20" rx="4" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="679" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#1d4ed8" text-anchor="middle">译码交付执行</text>
+
+  <!-- Destination: Execution Unit -->
+  <rect x="678" y="74" width="172" height="108" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.8" filter="url(#boxShadow)"/>
+  <rect x="678" y="74" width="172" height="26" rx="10" fill="#dcfce7"/>
+  <text x="764" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="12" fill="#15803d" text-anchor="middle">后端执行流转</text>
+  <text x="692" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#166534">DecodeInstr</text>
+  <text x="692" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#15803d">• instr: RiscvInstr</text>
+  <text x="692" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#15803d">• info: RVInstrInfo</text>
+  <text x="692" y="168" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#15803d">• get_exec_func()</text>
+
+  <!-- Invalidation Notice Box -->
+  <rect x="678" y="260" width="172" height="154" rx="10" fill="#fef2f2" stroke="#fecaca" stroke-width="1.5"/>
+  <rect x="678" y="260" width="172" height="26" rx="10" fill="#fee2e2"/>
+  <text x="764" y="278" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#b91c1c" text-anchor="middle">缓存失效与一致性</text>
+  <text x="688" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="600" fill="#991b1b">• fence.i (Zifencei)</text>
+  <text x="688" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#7f1d1d">自修改代码执行时</text>
+  <text x="688" y="340" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#b91c1c">icache_epoch += 1</text>
+  <text x="688" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#7f1d1d">O(1) 逻辑失效全部缓存</text>
+  <text x="688" y="380" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">彻底免除 8K 表项遍历</text>
+
+  <!-- Clear direct trigger from Execution down into Invalidation Box -->
+  <path d="M 764 182 L 764 252" stroke="#b91c1c" stroke-width="1.8" stroke-dasharray="4 2" fill="none" marker-end="url(#arrowRed)"/>
+  <text x="772" y="220" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#b91c1c">执行 fence.i</text>
+</svg>

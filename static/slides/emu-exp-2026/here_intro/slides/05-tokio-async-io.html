@@ -1,0 +1,373 @@
+<!--
+  第 5 页: ◈ 核心亮点三：Rust + Tokio —— 异步任务执行器架构
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点三：Rust + Tokio —— 异步任务执行器架构</h1>
+  <div class="text-xs text-slate-500 mb-1">主频推进与宿主 I/O 彻底解耦：TaskSpawner 托管独立 Tokio 线程池并发处理外设任务</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light h-full">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ CPU 纯计算与后台 Tokio Worker
+            流水线</span><span class="badge-blue">src/device/virtio/</span></div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_05_tokio_async_io_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 1251.8125px;" viewBox="-8 -8 1251.8125 131.04412841796875"
+            role="graphics-document document" aria-roledescription="flowchart-v2">
+            <style>
+              #svg_05_tokio_async_io_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_05_tokio_async_io_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_05_tokio_async_io_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_05_tokio_async_io_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_05_tokio_async_io_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_05_tokio_async_io_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_05_tokio_async_io_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_05_tokio_async_io_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_05_tokio_async_io_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_05_tokio_async_io_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_05_tokio_async_io_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_05_tokio_async_io_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_05_tokio_async_io_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_05_tokio_async_io_html .cluster-label span,
+              #svg_05_tokio_async_io_html p {
+                color: #333;
+              }
+
+              #svg_05_tokio_async_io_html .label text,
+              #svg_05_tokio_async_io_html span,
+              #svg_05_tokio_async_io_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_05_tokio_async_io_html .node rect,
+              #svg_05_tokio_async_io_html .node circle,
+              #svg_05_tokio_async_io_html .node ellipse,
+              #svg_05_tokio_async_io_html .node polygon,
+              #svg_05_tokio_async_io_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_05_tokio_async_io_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_05_tokio_async_io_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_05_tokio_async_io_html .node .label {
+                text-align: center;
+              }
+
+              #svg_05_tokio_async_io_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_05_tokio_async_io_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_05_tokio_async_io_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_05_tokio_async_io_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_05_tokio_async_io_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_05_tokio_async_io_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_05_tokio_async_io_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_05_tokio_async_io_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_05_tokio_async_io_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_05_tokio_async_io_html .cluster span,
+              #svg_05_tokio_async_io_html p {
+                color: #333;
+              }
+
+              #svg_05_tokio_async_io_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_05_tokio_async_io_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_05_tokio_async_io_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_05_tokio_async_io_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_05_tokio_async_io_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_05_tokio_async_io_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_05_tokio_async_io_html_flowchart-circleStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_05_tokio_async_io_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_05_tokio_async_io_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M171.547,49.874L183.691,47.232C195.836,44.59,220.125,39.306,243.531,36.664C266.936,34.022,289.459,34.022,300.72,34.022L311.981,34.022"
+                    id="L-CPU-MMIO-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CPU LE-MMIO"
+                    style="fill:none;" marker-end="url(#svg_05_tokio_async_io_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M427.422,34.022L440.615,34.022C453.807,34.022,480.193,34.022,505.695,34.022C531.197,34.022,555.816,34.022,568.125,34.022L580.434,34.022"
+                    id="L-MMIO-Worker-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-MMIO LE-Worker" style="fill:none;"
+                    marker-end="url(#svg_05_tokio_async_io_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M735.891,34.022L745.391,34.022C754.891,34.022,773.891,34.022,792.007,34.022C810.124,34.022,827.357,34.022,835.974,34.022L844.591,34.022"
+                    id="L-Worker-Disk-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Worker LE-Disk" style="fill:none;"
+                    marker-end="url(#svg_05_tokio_async_io_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M928.891,34.022L942.398,34.022C955.906,34.022,982.922,34.022,1009.076,36.866C1035.23,39.71,1060.522,45.398,1073.168,48.242L1085.814,51.085"
+                    id="L-Disk-Used-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Disk LE-Used"
+                    style="fill:none;" marker-end="url(#svg_05_tokio_async_io_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M1090.984,84.818L1077.477,87.856C1063.969,90.893,1036.953,96.969,1003.354,100.006C969.755,103.044,929.573,103.044,893.398,103.044C857.224,103.044,825.057,103.044,786.961,103.044C748.865,103.044,704.839,103.044,657.12,103.044C609.401,103.044,557.99,103.044,509.913,103.044C461.836,103.044,417.094,103.044,373.4,103.044C329.706,103.044,287.06,103.044,254.456,100.59C221.851,98.136,199.289,93.227,188.007,90.773L176.726,88.319"
+                    id="L-Used-CPU-0" class="edge-thickness-normal edge-pattern-dotted flowchart-link LS-Used LE-CPU"
+                    style="fill:none;stroke-width:2px;stroke-dasharray:3;"
+                    marker-end="url(#svg_05_tokio_async_io_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel" transform="translate(244.4140625, 34.02206039428711)">
+                    <g class="label" transform="translate(-47.8671875, -11)">
+                      <foreignObject width="95.734375" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">QueueNotify</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(506.578125, 34.02206039428711)">
+                    <g class="label" transform="translate(-54.15625, -12)">
+                      <foreignObject width="108.3125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">mpsc 任务分派</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(792.890625, 34.02206039428711)">
+                    <g class="label" transform="translate(-32, -12)">
+                      <foreignObject width="64" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">并发读写</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(1009.9375, 34.02206039428711)">
+                    <g class="label" transform="translate(-56.046875, -12)">
+                      <foreignObject width="112.09375" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">Fence 内存栅栏</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(660.8125, 103.04412078857422)">
+                    <g class="label" transform="translate(-32, -12)">
+                      <foreignObject width="64" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">异步打断</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-CPU-0" data-node="true" data-id="CPU"
+                    transform="translate(85.7734375, 68.53309059143066)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-85.7734375" y="-19.5"
+                      width="171.546875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-78.2734375, -12)">
+                      <rect></rect>
+                      <foreignObject width="156.546875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">CPU: 1024周期批处理</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-MMIO-1" data-node="true" data-id="MMIO"
+                    transform="translate(372.3515625, 34.02206039428711)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-55.0703125" y="-18.5"
+                      width="110.140625" height="37"></rect>
+                    <g class="label" style="" transform="translate(-47.5703125, -11)">
+                      <rect></rect>
+                      <foreignObject width="95.140625" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">VirtIO MMIO</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Worker-3" data-node="true"
+                    data-id="Worker" transform="translate(660.8125, 34.02206039428711)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-75.078125" y="-19.5"
+                      width="150.15625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-67.578125, -12)">
+                      <rect></rect>
+                      <foreignObject width="135.15625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Tokio 异步 Worker</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Disk-5" data-node="true" data-id="Disk"
+                    transform="translate(889.390625, 34.02206039428711)">
+                    <path style=""
+                      d="M 0,9.681372549019608 a 39.5,9.681372549019608 0,0,0 79 0 a 39.5,9.681372549019608 0,0,0 -79 0 l 0,48.681372549019606 a 39.5,9.681372549019608 0,0,0 79 0 l 0,-48.681372549019606"
+                      transform="translate(-39.5,-34.02205882352941)"></path>
+                    <g class="label" style="" transform="translate(-32, -12)">
+                      <rect></rect>
+                      <foreignObject width="64" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">磁盘镜像</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Used-7" data-node="true" data-id="Used"
+                    transform="translate(1163.3984375, 68.53309059143066)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-72.4140625" y="-18.5"
+                      width="144.828125" height="37"></rect>
+                    <g class="label" style="" transform="translate(-64.9140625, -11)">
+                      <rect></rect>
+                      <foreignObject width="129.828125" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">Used Ring &amp; PLIC</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 主线程仅操作环形队列描述符与 mpsc channel，杜绝阻塞主频推进。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ CPU 纯计算与后台 Worker 协同机制</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>主频零卡顿 (Zero CPU Stall)</b>：模拟器主线程专心执行 RISC-V 指令批，大块磁盘 I/O 不会阻塞系统时钟，避免 Guest OS 出现时钟严重漂移。 </li>
+          <li><b>非阻塞通道快速投递</b>：MMIO 寄存器写入触发 <code>QueueNotify</code> 时，仅将请求封包为 <code>VirtIOBlockIoTask</code> 推入
+            <code>mpsc::Sender</code>，耗时纳秒级。 </li>
+          <li><b>并发读写最大化吞吐</b>：独立 Tokio 运行时利用 Host OS 异步 I/O 引擎（epoll/io_uring），充分释放宿主 SSD 读写带宽。 </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-emerald-50/70 border border-emerald-200 rounded-lg">
+        <div class="font-bold text-emerald-800 mb-0.5 text-xs">❖ 工业级 Rust 异步生命周期管理 (TaskSpawner)</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          通过 <code>TaskSpawner</code> 统一收拢管理所有外设异步任务，后台自动拉起独立 Tokio 运行时单线程/多线程池，解耦生命周期。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

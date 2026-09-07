@@ -1,0 +1,98 @@
+<!--
+  第 12 页: ◈ 模块一：Board 构建 —— 虚拟主板与系统拓扑
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块一：Board 构建 —— 虚拟主板与系统拓扑</h1>
+  <div class="text-xs text-slate-500 mb-2">统一编排物理内存、MMIO 设备树拓扑与引导加载流程</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 虚拟主板结构体
+            (VirtBoard)</span><span class="badge-blue">src/board/virt.rs</span></div>
+        <div class="text-slate-600 leading-normal mb-1"> 全系统顶层容器，集聚 CPU、时钟源、物理内存与外设： </div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> struct</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VirtBoard</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Box</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">RVCPU</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> clock</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> VirtualClock</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> clint</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> DeviceHandle</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">Clint</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> plic</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> DeviceHandle</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">PLIC</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> device_arena</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> Box</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">DeviceArena</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;,</span></span>
+<span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">    pub</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> status</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> BoardStatus</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">,</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-500 text-xs mt-0.5"> 统一单步与 <code>step_batch(1024)</code> 批处理，推进时钟与中断仲裁。 </div>
+      </div>
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 多端主板构建器 (Builder Pattern)</span>
+        </div>
+        <ul class="text-slate-600 space-y-0.5 text-xs">
+          <li><b>Native CLI</b>: 完整支持 VirtIO Block、本地 ELF 文件加载、GDB TCP 远程监听。</li>
+          <li><b>WASM Target</b>: 纯内存流驱动，无缝对接浏览器 WebAssembly 异步运行时。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 物理地址空间映射 (Memory
+            Map)</span><span class="badge-orange">QEMU 对标</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>基地址 (Base)</th>
+              <th>大小</th>
+              <th>设备</th>
+              <th>中断 / 职责</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="text-blue-700">0x0010_0000</code></td>
+              <td>0x1000</td>
+              <td>PowerManager</td>
+              <td>软件关机 / 重启控制</td>
+            </tr>
+            <tr>
+              <td><code class="text-blue-700">0x0200_0000</code></td>
+              <td>0x1_0000</td>
+              <td>ACLINT/CLINT</td>
+              <td>mtime/mtimecmp 时钟中断</td>
+            </tr>
+            <tr>
+              <td><code class="text-blue-700">0x0c00_0000</code></td>
+              <td>0x400_0000</td>
+              <td>PLIC 中断控制器</td>
+              <td>外部中断优先级仲裁</td>
+            </tr>
+            <tr>
+              <td><code class="text-blue-700">0x1000_0000</code></td>
+              <td>0x8</td>
+              <td>UART 16550A</td>
+              <td>控制台串口 (IRQ: 10)</td>
+            </tr>
+            <tr>
+              <td><code class="text-blue-700">0x1000_1000</code></td>
+              <td>0x1000</td>
+              <td>VirtIO MMIO</td>
+              <td>块设备磁盘存储 (IRQ: 1~8)</td>
+            </tr>
+            <tr class="bg-orange-50/50">
+              <td><code class="text-orange-700 font-bold">0x8000_0000</code></td>
+              <td>默认 2GB</td>
+              <td>DRAM (Ram)</td>
+              <td>ELF 段加载 / 内核挂载</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-slate-500 text-xs mt-0.5"><code>ELFLoader</code> 解析 ELF 段并注入物理内存，重定向 Entry PC。 </div>
+      </div>
+    </div>
+  </div>
+</div>

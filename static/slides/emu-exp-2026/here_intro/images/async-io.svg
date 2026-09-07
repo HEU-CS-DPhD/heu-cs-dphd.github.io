@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" width="100%" height="100%">
+  <defs>
+    <filter id="shadowAsync" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="440" fill="#f8fafc" rx="14"/>
+
+  <!-- Title -->
+  <text x="36" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="16" fill="#0f172a">外设异步运行时体系 (Async Task Runtime Architecture)</text>
+  <text x="36" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">CPU 纯算力批处理推进与后台异步事件循环解耦 · 避免 I/O 阻塞主核模拟吞吐</text>
+
+  <!-- Left Side: CPU Main Execution Thread (Width: 370) -->
+  <g transform="translate(36, 76)">
+    <rect width="370" height="340" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="1.8" filter="url(#shadowAsync)"/>
+    <rect width="370" height="32" rx="10" fill="#eff6ff"/>
+    <text x="16" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="13" fill="#1d4ed8">CPU 主线程：批量执行模型 (Batch Step)</text>
+
+    <!-- Cycle Batch Box -->
+    <rect x="18" y="46" width="334" height="120" rx="8" fill="#f8fafc" stroke="#bfdbfe" stroke-width="1.2"/>
+    <text x="30" y="68" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">const STEP_BATCH_CYCLES: u64 = 1024;</text>
+    <text x="30" y="90" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 每次以 1024 指令周期为粒度紧凑内循环运行</text>
+    <text x="30" y="108" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 极大降低与宿主操作系统交互的上下文切换</text>
+    <text x="30" y="126" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">• 维持约 100 MIPS 纯指令模拟吞吐</text>
+    <text x="30" y="148" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#16a34a">BatchResult { cycles, hook_stopped }</text>
+
+    <!-- Non-blocking MMIO -->
+    <rect x="18" y="180" width="334" height="136" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+    <text x="30" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#15803d">零等待 MMIO 访问模式</text>
+    <text x="30" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#166534">• CPU 读写串口/磁盘 MMIO 时绝不执行阻塞系统调用</text>
+    <text x="30" y="244" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#166534">• 仅投递请求至 Ring 描述符队列或无锁 Channel</text>
+    <text x="30" y="264" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#166534">• 立即返回继续执行下一条指令，杜绝核停顿</text>
+    <text x="30" y="292" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#059669">VirtQueue: Desc → Avail → Used</text>
+  </g>
+
+  <!-- Middle Connector Arrows -->
+  <g transform="translate(416, 210)">
+    <path d="M 0 0 L 38 0" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrBlue)"/>
+    <text x="19" y="-10" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#2563eb" text-anchor="middle">非阻塞任务投递</text>
+
+    <path d="M 38 36 L 0 36" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#arrPurple)"/>
+    <text x="19" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" font-weight="700" fill="#7c3aed" text-anchor="middle">完成通知 / IRQ</text>
+  </g>
+
+  <!-- Right Side: Background Async Tokio TaskSpawner (Width: 370) -->
+  <g transform="translate(474, 76)">
+    <rect width="370" height="340" rx="10" fill="#ffffff" stroke="#ddd6fe" stroke-width="1.8" filter="url(#shadowAsync)"/>
+    <rect width="370" height="32" rx="10" fill="#f5f3ff"/>
+    <text x="16" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="13" fill="#6d28d9">后台异步运行时 (TaskSpawner &amp; Tokio)</text>
+
+    <!-- Async Tasks Box 1: UART Stream -->
+    <rect x="18" y="46" width="334" height="78" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="30" y="68" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#4c1d95">UART Async Stream Task</text>
+    <text x="30" y="86" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">独立异步监听标准输入 Stdin 与键盘转义控制符</text>
+    <text x="30" y="104" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#64748b">异步填充 RBR FIFO → 触发 PLIC IRQ 10 中断</text>
+
+    <!-- Async Tasks Box 2: VirtIO Disk File -->
+    <rect x="18" y="134" width="334" height="92" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+    <text x="30" y="156" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#4c1d95">VirtIO Block Disk I/O Task</text>
+    <text x="30" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#2563eb">tokio::fs::File (AsyncRead / AsyncWrite)</text>
+    <text x="30" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#475569">并发进行磁盘扇区读写与刷盘，完成后写 Used 环</text>
+    <text x="30" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#64748b">支撑 Linux RootFS/Ext4 文件系统零延迟挂载</text>
+
+    <!-- Graceful Cancellation via watch channel -->
+    <rect x="18" y="236" width="334" height="80" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.2"/>
+    <text x="30" y="256" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#c2410c">优雅退出与脏数据保护 (Graceful Shutdown)</text>
+    <text x="30" y="274" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#ea580c">cancel_tx: watch::Sender&lt;bool&gt;</text>
+    <text x="30" y="292" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#9a3412">模拟器关机时广播取消信号，安全 Flush 脏页并 Join 线程</text>
+  </g>
+</svg>

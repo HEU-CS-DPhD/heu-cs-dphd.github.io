@@ -1,0 +1,91 @@
+<!--
+  第 29 页: ◈ 模块四：调试系统 —— 内置交互式调试器 rvdb
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块四：调试系统 —— 内置交互式调试器 <code>rvdb</code></h1>
+  <div class="text-xs text-slate-500 mb-2">为系统结构实验与内核开发深度定制的交互式命令行调试环境 (REPL)</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ rvdb 核心命令矩阵</span><span
+            class="badge-blue">src/rvdb/</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>类别 / 命令</th>
+              <th>功能描述与典型示例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>step / continue</code></td>
+              <td><code>s</code> 单步步进；<code>c [N]</code> 持续执行至断点或步数上限</td>
+            </tr>
+            <tr>
+              <td><code>break / break delete</code></td>
+              <td><code>b [-v] [TARGET]</code> 物理/虚存/符号断点；<code>b d</code> 删除断点</td>
+            </tr>
+            <tr>
+              <td><code>list</code></td>
+              <td><code>l</code> 反汇编当前 PC 上下文指令与汇编助记符</td>
+            </tr>
+            <tr>
+              <td><code>translate</code></td>
+              <td><code>t &lt;ADDR&gt;</code> 虚实透视：遍历并打印 MMU 页表项属性</td>
+            </tr>
+            <tr>
+              <td><code>print / display</code></td>
+              <td><code>p [reg|pc|mem]</code> 查看状态；<code>dis</code> 设置单步自动监视</td>
+            </tr>
+            <tr>
+              <td><code>ftrace / history</code></td>
+              <td><code>ftrace</code> 动态调用树跟踪；<code>his [N]</code> 回溯近期执行指令</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-slate-500 text-xs mt-0.5"> 基于 <code>clap</code> 结构化解析与 <code>rustyline</code> 终端补全库驱动。 </div>
+      </div>
+      <div class="card-light flex-1 flex flex-col py-1.5">
+        <div class="font-bold text-slate-800 mb-1 text-xs flex items-center justify-between"><span>❖
+            调试器微架构特性</span><span class="badge-blue">零侵入</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>零侵入性</b>：通过指令级 Hook 介入，完全不改变客户机特权现场。</li>
+          <li><b>即时透视</b>：支持在断点处即时校验 CSR、虚拟内存与物理内存。</li>
+          <li><b>符号级反查</b>：结合 ELF 符号表实现函数名与物理/虚存双向解析。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 三种 REPL 运行时架构</span><span
+            class="badge-emerald">跨平台解耦</span></div>
+        <ul class="text-slate-600 space-y-0.5 text-xs">
+          <li><b>1. RustylineREPL (原生 CLI)</b>：支持高亮、Tab 自动补全、历史回溯。</li>
+          <li><b>2. SyncREPL (同步阻塞)</b>：用于自动化回归测试与脚本管道输入。</li>
+          <li><b>3. AsyncREPL (无标准库 &amp; WASM)</b>：通道异步驱动，支持 Web 浏览器调试。</li>
+        </ul>
+      </div>
+      <div class="card-slate flex-1 flex flex-col justify-between pb-2">
+        <div class="font-bold text-slate-800 mb-0.5 text-xs flex items-center justify-between"><span>❖ 交互式会话示范 (rvdb
+            CLI)</span><span class="badge-slate">实机运行</span></div>
+        <pre class="my-0.5 py-1 px-2 text-[11px] leading-tight"><code class="language-text">(rvdb) b main
+Breakpoint set at main <paddr(0x80001394)>
+(rvdb) c
+Breakpoint hit after 32776 steps: 0x80001394: addi sp, sp, -16 main
+(rvdb) l
+> 0x80001394: 0xff010113 addi sp, sp, -16 main
+  0x80001398: 0x00113423 sd ra, 8(sp)
+  0x8000139c: 0x00813023 sd s0/fp, 0(sp)
+  0x800013a0: 0x01010413 addi s0/fp, sp, 16
+  0x800013a4: 0x00003517 auipc a0, 3
+(rvdb) info b
+ 0: paddr(0x80001394)
+(rvdb) p pc
+pc = 0x80001394
+(rvdb) s
+Completed, next: 0x80001398: sd ra, 8(sp)</code></pre>
+      </div>
+    </div>
+  </div>
+</div>

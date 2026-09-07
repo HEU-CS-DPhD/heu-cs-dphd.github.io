@@ -1,0 +1,49 @@
+<!--
+  第 10 页: ◈ 核心亮点六：全系统验证 —— Initramfs 与 VirtIO 实机成果
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 核心亮点六：全系统验证 —— Initramfs 与 VirtIO 实机成果</h1>
+  <div class="text-xs text-slate-500 mb-1">双轨实测稳定性证明：全套虚拟内存换页、时间片轮转调度与多进程并发稳定运行</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 真实 Linux
+            内核启动终端捕获</span><span class="badge-emerald">Kernel Log 真实回显</span></div>
+        <div
+          class="p-2 bg-slate-950 text-slate-100 rounded-md font-mono text-[8.5px] leading-[1.28] overflow-hidden border border-slate-800 shadow-inner">
+          <div class="text-slate-400">[ 18.094899] clk: Disabling unused clocks</div>
+          <div class="text-slate-400">[ 18.095308] PM: genpd: Disabling unused power domains</div>
+          <div class="text-slate-400">[ 18.096332] ALSA device list:</div>
+          <div class="text-slate-500">&nbsp;&nbsp;No soundcards found.</div>
+          <div class="text-slate-300">[ 18.124569] Freeing unused kernel image (initmem) memory: 4948K</div>
+          <div class="text-sky-300 font-bold">[ 18.125593] Run /init as init process</div>
+          <div class="text-amber-400">---------------------------------------------</div>
+          <div class="text-amber-300 font-bold"> Welcome to run busybox on RISC-V Emulator </div>
+          <div class="text-amber-400">---------------------------------------------</div>
+          <div class="text-slate-400">Please press Enter to activate this console. </div>
+          <div class="text-emerald-400 font-bold">~ # uname -a</div>
+          <div class="text-slate-200">Linux (none) 6.18.2 #45 SMP Wed Jul 22 12:25:27 CST 2026 riscv64 GNU/Linux</div>
+        </div>
+        <div class="text-slate-500 text-xs mt-1"> 控制台通过 <code>UartBytePort</code> 直通宿主终端，支持标准 ANSI 颜色与交互。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span>❖ 双模式引导验证与系统级成果</span></div>
+        <ul class="text-slate-600 space-y-1.5 text-xs">
+          <li><b>模式一：Initramfs 极速内存盘启动</b>： 将 BusyBox 打包进内核内存镜像，快速全面检验特权态切换（M → S → U）、Timer 软中断调度与 Sv39 虚存映射机制。 </li>
+          <li><b>模式二：VirtIO-Block 持久化外部存储</b>： 通过 <code>--device virtio-block:./tmp/img_blk</code>
+            外挂真实磁盘镜像。内核成功识别设备驱动并挂载根文件系统。 </li>
+          <li><b>内核级稳定性证明 (Kernel-Grade)</b>： 稳定支撑多进程并发调度（Fork/Exec）、复杂文件系统读写、终端重定向及用户态复杂算力程序长期稳定运行。 </li>
+        </ul>
+      </div>
+      <div class="p-2 bg-purple-50/70 border border-purple-200 rounded-lg">
+        <div class="font-bold text-purple-800 mb-0.5 text-xs">❖ 工业级软硬件联合验证</div>
+        <div class="text-slate-600 text-xs leading-relaxed">
+          可配合 <code>--loglevel=debug</code> 或 <code>-G</code> GDB Stub，在 Linux 内核启动全生命周期内精确单步排查任一硬件异常与中断交付。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

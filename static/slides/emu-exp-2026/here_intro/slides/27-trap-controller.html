@@ -1,0 +1,393 @@
+<!--
+  第 27 页: ◈ 模块三：中断系统 —— 特权级流转与 Trap 控制器
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块三：中断系统 —— 特权级流转与 Trap 控制器</h1>
+  <div class="text-xs text-slate-500 mb-2">统一的异常与中断接管模型 · 硬件委派机制与原子现场回滚</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 陷阱委派流转判定 (Trap
+            Delegation)</span><span class="badge-blue">src/isa/riscv/trap/</span></div>
+        <div class="text-slate-600 leading-normal mb-0.5"> 异常与外部中断统一接管，依据委派位快速分流： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0 6px 0;"><svg
+            id="svg_27_trap_controller_html" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 100%; max-height: 320px; width: auto; height: auto;" viewBox="-8 -8 630.671875 561.171875" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_27_trap_controller_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_27_trap_controller_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_27_trap_controller_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_27_trap_controller_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_27_trap_controller_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_27_trap_controller_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_27_trap_controller_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_27_trap_controller_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_27_trap_controller_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_27_trap_controller_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_27_trap_controller_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_27_trap_controller_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_27_trap_controller_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_27_trap_controller_html .cluster-label span,
+              #svg_27_trap_controller_html p {
+                color: #333;
+              }
+
+              #svg_27_trap_controller_html .label text,
+              #svg_27_trap_controller_html span,
+              #svg_27_trap_controller_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_27_trap_controller_html .node rect,
+              #svg_27_trap_controller_html .node circle,
+              #svg_27_trap_controller_html .node ellipse,
+              #svg_27_trap_controller_html .node polygon,
+              #svg_27_trap_controller_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_27_trap_controller_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_27_trap_controller_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_27_trap_controller_html .node .label {
+                text-align: center;
+              }
+
+              #svg_27_trap_controller_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_27_trap_controller_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_27_trap_controller_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_27_trap_controller_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_27_trap_controller_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_27_trap_controller_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_27_trap_controller_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_27_trap_controller_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_27_trap_controller_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_27_trap_controller_html .cluster span,
+              #svg_27_trap_controller_html p {
+                color: #333;
+              }
+
+              #svg_27_trap_controller_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_27_trap_controller_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_27_trap_controller_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_27_trap_controller_html_flowchart-pointEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_27_trap_controller_html_flowchart-pointStart" class="marker flowchart" viewBox="0 0 10 10"
+                refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_27_trap_controller_html_flowchart-circleEnd" class="marker flowchart" viewBox="0 0 10 10"
+                refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_27_trap_controller_html_flowchart-circleStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_27_trap_controller_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_27_trap_controller_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M300.434,39L300.434,43.167C300.434,47.333,300.434,55.667,300.5,63.2C300.566,70.734,300.698,77.467,300.764,80.834L300.83,84.201"
+                    id="L-Trap-Check-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Trap LE-Check"
+                    style="fill:none;" marker-end="url(#svg_27_trap_controller_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M236.99,279.728L219.869,296.469C202.749,313.209,168.507,346.691,151.386,368.715C134.266,390.739,134.266,401.305,134.266,406.589L134.266,411.872"
+                    id="L-Check-SMode-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Check LE-SMode" style="fill:none;"
+                    marker-end="url(#svg_27_trap_controller_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M364.877,279.728L381.831,296.469C398.785,313.209,432.693,346.691,449.647,368.715C466.602,390.739,466.602,401.305,466.602,406.589L466.602,411.872"
+                    id="L-Check-MMode-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Check LE-MMode" style="fill:none;"
+                    marker-end="url(#svg_27_trap_controller_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M134.266,456.172L134.266,460.339C134.266,464.505,134.266,472.839,134.266,480.289C134.266,487.739,134.266,494.305,134.266,497.589L134.266,500.872"
+                    id="L-SMode-SRet-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-SMode LE-SRet"
+                    style="fill:none;" marker-end="url(#svg_27_trap_controller_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M466.602,456.172L466.602,460.339C466.602,464.505,466.602,472.839,466.602,480.289C466.602,487.739,466.602,494.305,466.602,497.589L466.602,500.872"
+                    id="L-MMode-MRet-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-MMode LE-MRet"
+                    style="fill:none;" marker-end="url(#svg_27_trap_controller_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(134.265625, 380.171875)">
+                    <g class="label" transform="translate(-37.3125, -12)">
+                      <foreignObject width="74.625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">已委派 = 1</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(466.6015625, 380.171875)">
+                    <g class="label" transform="translate(-37.3125, -12)">
+                      <foreignObject width="74.625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">未委派 = 0</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-Trap-82" data-node="true" data-id="Trap"
+                    transform="translate(300.43359375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-62.640625" y="-19.5"
+                      width="125.28125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-55.140625, -12)">
+                      <rect></rect>
+                      <foreignObject width="110.28125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">异常 / 中断触发</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Check-83" data-node="true"
+                    data-id="Check" transform="translate(300.43359375, 216.0859375)">
+                    <polygon points="127.0859375,0 254.171875,-127.0859375 127.0859375,-254.171875 0,-127.0859375"
+                      class="label-container" transform="translate(-127.0859375,127.0859375)" style=""></polygon>
+                    <g class="label" style="" transform="translate(-100.0859375, -12)">
+                      <rect></rect>
+                      <foreignObject width="200.171875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">mideleg / medeleg 委派位?</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-SMode-85" data-node="true"
+                    data-id="SMode" transform="translate(134.265625, 436.671875)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-134.265625" y="-19.5"
+                      width="268.53125" height="39"></rect>
+                    <g class="label" style="" transform="translate(-126.765625, -12)">
+                      <rect></rect>
+                      <foreignObject width="253.53125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">交付 S-Mode: stvec / sepc / scause</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-MMode-87" data-node="true"
+                    data-id="MMode" transform="translate(466.6015625, 436.671875)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-148.0703125" y="-19.5"
+                      width="296.140625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-140.5703125, -12)">
+                      <rect></rect>
+                      <foreignObject width="281.140625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">升格 M-Mode: mtvec / mepc / mcause</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-SRet-89" data-node="true" data-id="SRet"
+                    transform="translate(134.265625, 525.671875)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-55.9609375" y="-19.5"
+                      width="111.921875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-48.4609375, -12)">
+                      <rect></rect>
+                      <foreignObject width="96.921875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">sret 恢复执行</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-MRet-91" data-node="true" data-id="MRet"
+                    transform="translate(466.6015625, 525.671875)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-59.609375" y="-19.5"
+                      width="119.21875" height="39"></rect>
+                    <g class="label" style="" transform="translate(-52.109375, -12)">
+                      <rect></rect>
+                      <foreignObject width="104.21875" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">mret 恢复执行</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+        <div class="text-slate-500 text-xs mt-1"> 直接委派机制绕过 M 态代理，中断直达 Linux 监管态处理。 </div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 现场保护与原子恢复
+            (xRET)</span><span class="badge-emerald">状态栈回滚</span></div>
+        <div class="slidev-code-wrapper relative group" data-title="" style="--start: 1;"><!--v-if-->
+          <pre class="shiki shiki-themes vitesse-dark vitesse-light slidev-code"
+            style="--shiki-dark: #dbd7caee; --shiki-light: #393a34; --shiki-dark-bg: #121212; --shiki-light-bg: #ffffff;"><code class="language-rust"><span class="line"><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;">pub</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> fn</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;"> mret</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">:</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;"> &amp;mut</span><span style="--shiki-dark: #C99076; --shiki-light: #A65E2B;"> RVCPU</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> {</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">    let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> mstatus</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">csr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">get_by_type_existing</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&lt;</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;">Mstatus</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">&gt;();</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    mstatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">set_mie</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">mstatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">get_mpie</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">());</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    mstatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">set_mpie</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #4C9A91; --shiki-light: #2F798A;">1</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">write_pc</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">csr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">read_uncheck_privilege</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">Mepc</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">get_index</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">())</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">unwrap</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">());</span></span>
+<span class="line"><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">    let</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> new_priv</span><span style="--shiki-dark: #666666; --shiki-light: #999999;"> =</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;"> mstatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">get_mpp</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">()</span><span style="--shiki-dark: #4D9375; --shiki-light: #1E754F;"> as</span><span style="--shiki-dark: #5DA994; --shiki-light: #2E8F82;"> u8</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">;</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    cpu</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #DBD7CAEE; --shiki-light: #393A34;">csr</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">set_current_privileged</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">PrivilegeLevel</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">::</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">try_from</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">new_priv</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">)</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">unwrap</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">());</span></span>
+<span class="line"><span style="--shiki-dark: #BD976A; --shiki-light: #B07D48;">    mstatus</span><span style="--shiki-dark: #CB7676; --shiki-light: #AB5959;">.</span><span style="--shiki-dark: #80A665; --shiki-light: #59873A;">set_mpp</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">(</span><span style="--shiki-dark: #4C9A91; --shiki-light: #2F798A;">0</span><span style="--shiki-dark: #666666; --shiki-light: #999999;">);</span></span>
+<span class="line"><span style="--shiki-dark: #666666; --shiki-light: #999999;">}</span></span></code></pre><button
+            class="slidev-code-copy absolute right-0 transition opacity-0 group-hover:opacity-20 hover:!opacity-100 top-0"
+            title="Copy"><svg class="slidev-icon p-2 w-8 h-8" viewBox="0 0 256 256" width="1.2em" height="1.2em">
+              <path fill="currentColor"
+                d="M200 32h-36.26a47.92 47.92 0 0 0-71.48 0H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16m-72 0a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32m72 184H56V48h26.75A47.9 47.9 0 0 0 80 64v8a8 8 0 0 0 8 8h80a8 8 0 0 0 8-8v-8a47.9 47.9 0 0 0-2.75-16H200Z">
+              </path>
+            </svg></button>
+        </div>
+        <div class="text-slate-500 text-xs mt-0.5"> 支持 Direct 模式与 Vectored 向量化入口 (<code>base + 4 × cause</code>)。 </div>
+      </div>
+    </div>
+  </div>
+</div>

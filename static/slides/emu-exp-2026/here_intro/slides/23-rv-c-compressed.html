@@ -1,0 +1,36 @@
+<!--
+  第 23 页: ◈ 模块二：后端执行扩展 —— 压缩指令集 (RV_C)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 压缩指令集 (RV_C)</h1>
+  <div class="text-xs text-slate-500 mb-2">显著提升代码密度 25%~30% 的 16-bit 紧凑编码指令集体系</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ RVC 象限分发架构</span><span
+            class="badge-blue">16-bit 编码拆解</span></div>
+        <div class="text-slate-600 leading-normal mb-1"> 依据最低 2 位 <code>op[1:0]</code> 极速分流三大象限： </div>
+        <ul class="text-slate-600 space-y-1">
+          <li><b>Quadrant 0 (C0)</b>：栈与紧凑加载存储 (<code>c.addi4spn</code>, <code>c.lw</code>, <code>c.sw</code>,
+            <code>c.ld</code>, <code>c.sd</code>)。 </li>
+          <li><b>Quadrant 1 (C1)</b>：控制流与运算 (<code>c.addi</code>, <code>c.jal</code>, <code>c.li</code>,
+            <code>c.lui</code>, <code>c.j</code>, <code>c.beqz</code>, <code>c.bnez</code>)。 </li>
+          <li><b>Quadrant 2 (C2)</b>：栈指针快速寻址 (<code>c.slli</code>, <code>c.lwsp</code>, <code>c.ldsp</code>,
+            <code>c.jr</code>, <code>c.mv</code>, <code>c.jalr</code>, <code>c.add</code>, <code>c.swsp</code>)。 </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 架构设计亮点</span><span
+            class="badge-emerald">无损展开</span></div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>零执行开销无损展开</b>：前端 <code>CompressedDecoder</code> 在译码阶段直接将 RVC 指令等价转换为标准 32 位指令表示，执行器无需多余分支判断。 </li>
+          <li><b>栈帧调整专用加速</b>：<code>c.addi16sp</code> 以极小的 16 位编码开销频繁调整栈指针，大幅压缩函数调用入口代码体积。 </li>
+          <li><b>iCache 16 位对齐支持</b>：将 <code>ADDR_SHIFT_BITS</code> 设为 1，精准索引半字边界对齐指令，完美适配 RVC 与普通指令混排场景。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

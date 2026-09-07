@@ -1,0 +1,383 @@
+<!--
+  第 20 页: ◈ 模块二：后端执行扩展 —— 整数乘除法扩展 (RV_M)
+  Layout: slidev-layout default
+-->
+<div class="slidev-layout default">
+  <h1>◈ 模块二：后端执行扩展 —— 整数乘除法扩展 (RV_M)</h1>
+  <div class="text-xs text-slate-500 mb-2">严格遵照硬件规范：除零与溢出无异常抛出 · 硬件 Corner Cases 决策判定</div>
+  <div class="grid grid-cols-12 gap-3 text-xs">
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 硬件 Corner Cases
+            决策流程</span><span class="badge-orange">硬件级合规</span></div>
+        <div class="text-slate-600 leading-normal mb-0.5"> RISC-V 规范明确要求乘除法<b>不产生 Trap</b>，由硬件静默返回定义伪值： </div>
+        <div class="mermaid-rendered" style="width: 100%; display: flex; justify-content: center; margin: 4px 0;"><svg
+            id="svg_20_rv_m_multiply_divide_html" width="100%" xmlns="http://www.w3.org/2000/svg"
+            style="max-width: 910.703125px;" viewBox="-8 -8 910.703125 300.53125" role="graphics-document document"
+            aria-roledescription="flowchart-v2">
+            <style>
+              #svg_20_rv_m_multiply_divide_html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+                fill: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .error-icon {
+                fill: #552222;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .error-text {
+                fill: #552222;
+                stroke: #552222;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edge-thickness-normal {
+                stroke-width: 2px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edge-thickness-thick {
+                stroke-width: 3.5px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edge-pattern-solid {
+                stroke-dasharray: 0;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edge-pattern-dashed {
+                stroke-dasharray: 3;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edge-pattern-dotted {
+                stroke-dasharray: 2;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .marker {
+                fill: #6366f1;
+                stroke: #6366f1;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .marker.cross {
+                stroke: #6366f1;
+              }
+
+              #svg_20_rv_m_multiply_divide_html svg {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 16px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .label {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                color: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .cluster-label text {
+                fill: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .cluster-label span,
+              #svg_20_rv_m_multiply_divide_html p {
+                color: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .label text,
+              #svg_20_rv_m_multiply_divide_html span,
+              #svg_20_rv_m_multiply_divide_html p {
+                fill: #333;
+                color: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .node rect,
+              #svg_20_rv_m_multiply_divide_html .node circle,
+              #svg_20_rv_m_multiply_divide_html .node ellipse,
+              #svg_20_rv_m_multiply_divide_html .node polygon,
+              #svg_20_rv_m_multiply_divide_html .node path {
+                fill: #ECECFF;
+                stroke: #9370DB;
+                stroke-width: 1px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .flowchart-label text {
+                text-anchor: middle;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .node .katex path {
+                fill: #000;
+                stroke: #000;
+                stroke-width: 1px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .node .label {
+                text-align: center;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .node.clickable {
+                cursor: pointer;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .arrowheadPath {
+                fill: #333333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edgePath .path {
+                stroke: #6366f1;
+                stroke-width: 2.0px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .flowchart-link {
+                stroke: #6366f1;
+                fill: none;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edgeLabel {
+                background-color: #e8e8e8;
+                text-align: center;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .edgeLabel rect {
+                opacity: 0.5;
+                background-color: #e8e8e8;
+                fill: #e8e8e8;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .labelBkg {
+                background-color: rgba(232, 232, 232, 0.5);
+              }
+
+              #svg_20_rv_m_multiply_divide_html .cluster rect {
+                fill: #ffffde;
+                stroke: #aaaa33;
+                stroke-width: 1px;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .cluster text {
+                fill: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .cluster span,
+              #svg_20_rv_m_multiply_divide_html p {
+                color: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html div.mermaidTooltip {
+                position: absolute;
+                text-align: center;
+                max-width: 200px;
+                padding: 2px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+                font-size: 12px;
+                background: #f8fafc;
+                border: 1px solid #aaaa33;
+                border-radius: 2px;
+                pointer-events: none;
+                z-index: 100;
+              }
+
+              #svg_20_rv_m_multiply_divide_html .flowchartTitleText {
+                text-anchor: middle;
+                font-size: 18px;
+                fill: #333;
+              }
+
+              #svg_20_rv_m_multiply_divide_html :root {
+                --mermaid-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei UI", sans-serif;
+              }
+            </style>
+            <g>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-pointEnd" class="marker flowchart"
+                viewBox="0 0 10 10" refX="6" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+                orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-pointStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+                orient="auto">
+                <path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath"
+                  style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-circleEnd" class="marker flowchart"
+                viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-circleStart" class="marker flowchart"
+                viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;">
+                </circle>
+              </marker>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-crossEnd" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <marker id="svg_20_rv_m_multiply_divide_html_flowchart-crossStart" class="marker cross flowchart"
+                viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+                orient="auto">
+                <path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+                  style="stroke-width: 2; stroke-dasharray: 1, 0;"></path>
+              </marker>
+              <g class="root">
+                <g class="clusters"></g>
+                <g class="edgePaths">
+                  <path
+                    d="M157.5,103.133L161.667,103.133C165.833,103.133,174.167,103.133,181.7,103.199C189.234,103.265,195.967,103.397,199.334,103.463L202.701,103.529"
+                    id="L-DIV-Zero-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-DIV LE-Zero"
+                    style="fill:none;" marker-end="url(#svg_20_rv_m_multiply_divide_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M310.537,73.28L321.013,64.316C331.488,55.353,352.44,37.427,367.532,28.463C382.624,19.5,391.857,19.5,396.474,19.5L401.091,19.5"
+                    id="L-Zero-RetZero-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Zero LE-RetZero"
+                    style="fill:none;" marker-end="url(#svg_20_rv_m_multiply_divide_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M310.537,133.986L321.013,142.783C331.488,151.579,352.44,169.172,369.062,178.042C385.684,186.911,397.977,187.057,404.124,187.13L410.271,187.203"
+                    id="L-Zero-Ovf-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Zero LE-Ovf"
+                    style="fill:none;" marker-end="url(#svg_20_rv_m_multiply_divide_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M587.652,163.816L598.424,160.308C609.195,156.799,630.738,149.782,646.126,146.274C661.515,142.766,670.748,142.766,675.365,142.766L679.981,142.766"
+                    id="L-Ovf-RetOvf-0" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Ovf LE-RetOvf"
+                    style="fill:none;" marker-end="url(#svg_20_rv_m_multiply_divide_html_flowchart-pointEnd)"></path>
+                  <path
+                    d="M587.652,210.715L598.424,214.057C609.195,217.399,630.738,224.082,651.662,227.424C672.585,230.766,692.889,230.766,703.04,230.766L713.192,230.766"
+                    id="L-Ovf-RetNorm-0"
+                    class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Ovf LE-RetNorm" style="fill:none;"
+                    marker-end="url(#svg_20_rv_m_multiply_divide_html_flowchart-pointEnd)"></path>
+                </g>
+                <g class="edgeLabels">
+                  <g class="edgeLabel">
+                    <g class="label" transform="translate(0, 0)">
+                      <foreignObject width="0" height="0">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel"></span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(373.390625, 19.5)">
+                    <g class="label" transform="translate(-8, -12)">
+                      <foreignObject width="16" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">是</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(373.390625, 186.765625)">
+                    <g class="label" transform="translate(-8, -12)">
+                      <foreignObject width="16" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">否</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(652.28125, 142.765625)">
+                    <g class="label" transform="translate(-8, -12)">
+                      <foreignObject width="16" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">是</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="edgeLabel" transform="translate(652.28125, 230.765625)">
+                    <g class="label" transform="translate(-8, -12)">
+                      <foreignObject width="16" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="edgeLabel">否</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+                <g class="nodes">
+                  <g class="node default default flowchart-label" id="flowchart-DIV-50" data-node="true" data-id="DIV"
+                    transform="translate(78.75, 103.1328125)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-78.75" y="-19.5" width="157.5"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-71.25, -12)">
+                      <rect></rect>
+                      <foreignObject width="142.5" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">除法运算 DIV / REM</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Zero-51" data-node="true" data-id="Zero"
+                    transform="translate(273.9453125, 103.1328125)">
+                    <polygon points="66.4453125,0 132.890625,-66.4453125 66.4453125,-132.890625 0,-66.4453125"
+                      class="label-container" transform="translate(-66.4453125,66.4453125)" style=""></polygon>
+                    <g class="label" style="" transform="translate(-39.4453125, -12)">
+                      <rect></rect>
+                      <foreignObject width="78.890625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">除数 == 0 ?</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-RetZero-53" data-node="true"
+                    data-id="RetZero" transform="translate(512.8359375, 19.5)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-106.4453125" y="-19.5"
+                      width="212.890625" height="39"></rect>
+                    <g class="label" style="" transform="translate(-98.9453125, -12)">
+                      <rect></rect>
+                      <foreignObject width="197.890625" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">DIV -&gt; -1 / REM -&gt; 原被除数</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-Ovf-55" data-node="true" data-id="Ovf"
+                    transform="translate(512.8359375, 186.765625)">
+                    <polygon points="97.765625,0 195.53125,-97.765625 97.765625,-195.53125 0,-97.765625"
+                      class="label-container" transform="translate(-97.765625,97.765625)" style=""></polygon>
+                    <g class="label" style="" transform="translate(-70.765625, -12)">
+                      <rect></rect>
+                      <foreignObject width="141.53125" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">溢出 INT_MIN / -1 ?</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-RetOvf-57" data-node="true"
+                    data-id="RetOvf" transform="translate(789.9921875, 142.765625)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-104.7109375" y="-18.5"
+                      width="209.421875" height="37"></rect>
+                    <g class="label" style="" transform="translate(-97.2109375, -11)">
+                      <rect></rect>
+                      <foreignObject width="194.421875" height="22">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">DIV -&gt; INT_MIN / REM -&gt; 0</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                  <g class="node default default flowchart-label" id="flowchart-RetNorm-59" data-node="true"
+                    data-id="RetNorm" transform="translate(789.9921875, 230.765625)">
+                    <rect class="basic label-container" style="" rx="0" ry="0" x="-71.5" y="-19.5" width="143"
+                      height="39"></rect>
+                    <g class="label" style="" transform="translate(-64, -12)">
+                      <rect></rect>
+                      <foreignObject width="128" height="24">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">
+                          <span class="nodeLabel">正常硬件除法结果</span></div>
+                      </foreignObject>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </svg></div>
+      </div>
+    </div>
+    <div class="col-span-6 flex flex-col gap-2">
+      <div class="card-light">
+        <div class="font-bold text-slate-800 mb-1 flex items-center justify-between"><span>❖ 高低位乘积与 32 位截断指令</span><span
+            class="badge-blue">M 扩展指令矩阵</span></div>
+        <ul class="text-slate-600 space-y-1.5 mt-1">
+          <li><b>高低位乘法拆分</b>： <code>MUL</code> (低 64 位结果)；<code>MULH</code> (有符号高 64 位)、<code>MULHU</code> (无符号高 64
+            位)、<code>MULHSU</code> (有符号×无符号高位乘积)。 </li>
+          <li><b>硬件精确除法与取余</b>： <code>DIV / DIVU</code> (有符号/无符号商)，<code>REM / REMU</code> (有符号/无符号余数)。 </li>
+          <li><b>64 位特有截断乘除 (*W)</b>： <code>MULW / DIVW / DIVUW / REMW / REMUW</code>，对 32 位运算后强制符号扩展至 64 位。 </li>
+          <li><b>泛型实现</b>：基于 <code>num-traits</code> 库高精度模拟，通过 riscv-tests 全项验证。 </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

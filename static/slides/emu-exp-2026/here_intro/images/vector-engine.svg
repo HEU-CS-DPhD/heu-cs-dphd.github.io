@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" width="100%" height="100%">
+  <defs>
+    <filter id="cardSh" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+  </defs>
+
+  <rect width="880" height="440" fill="#f8fafc" rx="14"/>
+
+  <!-- Title -->
+  <text x="36" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="16" fill="#0f172a">RVV 1.0 向量计算引擎体系 (Vector Execution Unit)</text>
+  <text x="36" y="58" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#64748b">VLEN = 128 bit · 32 Vector Regs · 动态 VSEW/VLMUL · 向量访存与定点/浮点加速</text>
+
+  <!-- Left Column: Vector Registers File (Width: 260) -->
+  <rect x="36" y="76" width="260" height="336" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.6" filter="url(#cardSh)"/>
+  <rect x="36" y="76" width="260" height="28" rx="10" fill="#fff7ed"/>
+  <text x="50" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#c2410c">向量寄存器堆 (VectorRegFile)</text>
+
+  <g transform="translate(50, 114)">
+    <!-- V0 (Mask) -->
+    <rect x="0" y="0" width="232" height="24" rx="4" fill="#ffedd5" stroke="#fdba74" stroke-width="1"/>
+    <text x="10" y="16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#9a3412">v0 (Mask / General)</text>
+    <text x="170" y="16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#c2410c">128 bits</text>
+
+    <!-- V1-V3 -->
+    <rect x="0" y="30" width="232" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11.5" fill="#334155">v1</text>
+    <text x="170" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#94a3b8">128 bits</text>
+
+    <rect x="0" y="56" width="232" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11.5" fill="#334155">v2</text>
+    <text x="170" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#94a3b8">128 bits</text>
+
+    <rect x="0" y="82" width="232" height="22" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11.5" fill="#334155">v3</text>
+    <text x="170" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#94a3b8">128 bits</text>
+
+    <text x="116" y="124" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="14" fill="#94a3b8" text-anchor="middle">⋮</text>
+
+    <!-- V31 -->
+    <rect x="0" y="136" width="232" height="24" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="600" font-size="11.5" fill="#334155">v31</text>
+    <text x="170" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#94a3b8">128 bits</text>
+
+    <!-- Element Slicing Showcase (VSEW) -->
+    <rect x="0" y="174" width="232" height="106" rx="6" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+    <text x="10" y="192" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#b45309">动态元素切分 (VSEW 动态配置)</text>
+    <text x="10" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#92400e">• SEW=8  → 16 × 8-bit Elements</text>
+    <text x="10" y="226" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#92400e">• SEW=16 → 8  × 16-bit Elements</text>
+    <text x="10" y="242" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#92400e">• SEW=32 → 4  × 32-bit Elements</text>
+    <text x="10" y="258" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#92400e">• SEW=64 → 2  × 64-bit Elements</text>
+  </g>
+
+  <!-- Middle Column: Vector CSR Config & Status (Width: 260) -->
+  <rect x="314" y="76" width="260" height="336" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.6" filter="url(#cardSh)"/>
+  <rect x="314" y="76" width="260" height="28" rx="10" fill="#eff6ff"/>
+  <text x="328" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#1d4ed8">向量控制状态配置 (Vector CSRs)</text>
+
+  <g transform="translate(328, 114)">
+    <!-- vtype -->
+    <rect x="0" y="0" width="232" height="58" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="18" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">vtype: 向量数据类型格式</text>
+    <text x="10" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11.5" fill="#334155">VSEW (e8..e64) | VLMUL (1/8..8)</text>
+    <text x="10" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="600" fill="#475569">vta (尾部策略) / vma (掩码策略)</text>
+
+    <!-- vl & vstart -->
+    <rect x="0" y="68" width="232" height="46" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="86" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">vl &amp; vstart</text>
+    <text x="10" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">vl: 活动向量长度 | vstart: 起始索引</text>
+
+    <!-- vxrm & vxsat -->
+    <rect x="0" y="124" width="232" height="46" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="142" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11" fill="#1e40af">vxrm &amp; vxsat (定点舍入/溢出)</text>
+    <text x="10" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">4 种舍入模式 (RNU/RNE/RDN/ROD) · 饱和标志</text>
+
+    <!-- Fault Index Tracking -->
+    <rect x="0" y="180" width="232" height="100" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="10" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#15803d">精确异常保证 (Precise Trap)</text>
+    <text x="10" y="218" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#166534">VectorMemException::Memory {</text>
+    <text x="20" y="234" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#166534">fault_index: usize,</text>
+    <text x="20" y="248" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#166534">exception: Exception</text>
+    <text x="10" y="264" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#15803d">} → 发生缺页时精确回写 vstart</text>
+  </g>
+
+  <!-- Right Column: Operations & Memory (Width: 260) -->
+  <rect x="592" y="76" width="252" height="336" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6" filter="url(#cardSh)"/>
+  <rect x="592" y="76" width="252" height="28" rx="10" fill="#f1f5f9"/>
+  <text x="606" y="96" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="800" font-size="12" fill="#0f172a">运算原语与访存模式</text>
+
+  <g transform="translate(606, 114)">
+    <!-- Memory Operations -->
+    <rect x="0" y="0" width="224" height="74" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="18" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#0f172a">多元化向量内存加载/存储</text>
+    <text x="10" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">• Unit-Stride: 连续线性装载</text>
+    <text x="10" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">• Strided: base + index × stride</text>
+    <text x="10" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#475569">• Indexed: 变址访存 (Gather/Scatter)</text>
+
+    <!-- Arithmetic Modules -->
+    <rect x="0" y="84" width="224" height="196" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="10" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-weight="700" font-size="11.5" fill="#0f172a">算术计算模块矩阵</text>
+    <text x="10" y="120" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#2563eb">• vadd / vsub / vmul / vdiv</text>
+    <text x="10" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#2563eb">• vsadd / vssub (饱和定点加减)</text>
+    <text x="10" y="152" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#2563eb">• vaadd / vasub (平均值定点)</text>
+    <text x="10" y="168" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#059669">• vfadd / vfsub / vfmul (向量浮点)</text>
+    <text x="10" y="184" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#059669">• vredsum / vfredusum (标量规约)</text>
+    <text x="10" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#d97706">• vslideup / vslidedown (滑移)</text>
+    <text x="10" y="216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" fill="#7c3aed">• vmand / vmxor / vmseq (掩码)</text>
+    <text x="10" y="240" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="11" font-weight="700" fill="#15803d">强力支撑 GEMM 矩阵乘与 AI 加速</text>
+  </g>
+</svg>
